@@ -62,10 +62,12 @@ class AuthController extends Notifier<AuthState> {
       final result = await _api.login(username, password);
       if (result['success'] == true) {
         final session = result['session'] as Map?;
+        // The Flask backend returns name/profileImage at the top level; the
+        // (newer) session object is preferred when present.
         final user = AppUser(
           email: username,
-          name: (session?['name'] as String?) ?? username,
-          profileImage: session?['profileImage'] as String?,
+          name: (session?['name'] as String?) ?? (result['name'] as String?) ?? username,
+          profileImage: (session?['profileImage'] as String?) ?? (result['profileImage'] as String?),
         );
         await _storage.setUser(user);
         await _cacheSession(session);
@@ -112,6 +114,16 @@ class AuthController extends Notifier<AuthState> {
     }
     await _storage.clearAll();
     state = const AuthState(bootstrapped: true);
+  }
+
+  /// Applies a locally-edited profile (name / image) to state + storage,
+  /// after a successful `/api/update-profile` call.
+  Future<void> applyProfile({String? name, String? profileImage}) async {
+    final current = state.user;
+    if (current == null) return;
+    final updated = current.copyWith(name: name, profileImage: profileImage);
+    await _storage.setUser(updated);
+    state = state.copyWith(user: updated);
   }
 
   Future<void> _cacheSession(Map? session) async {

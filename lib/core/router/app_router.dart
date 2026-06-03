@@ -6,11 +6,14 @@ import '../../features/auth/auth_controller.dart';
 import '../../features/auth/landing_page.dart';
 import '../../features/auth/login_page.dart';
 import '../../features/auth/signup_page.dart';
-import '../../features/common/placeholder_page.dart';
+import '../../features/career_report/career_report_page.dart';
+import '../../features/common/not_found_page.dart';
 import '../../features/job_detail/job_detail_page.dart';
 import '../../features/onboarding/onboarding_page.dart';
 import '../../features/payment/payment_page.dart';
+import '../../features/profile/profile_page.dart';
 import '../../features/recommendations/recommendations_page.dart';
+import '../../features/settings/settings_page.dart';
 
 /// App route names/paths, mirroring the web router.
 abstract class Routes {
@@ -47,6 +50,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: Routes.landing,
     debugLogDiagnostics: kDebugMode,
     refreshListenable: refresh,
+    errorBuilder: (_, _) => const NotFoundPage(),
     redirect: (context, state) {
       final auth = ref.read(authControllerProvider);
       if (!auth.bootstrapped) return null;
@@ -79,15 +83,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.careerReport,
-        builder: (_, _) => const PlaceholderPage(title: 'Mindset Report', phase: 'Phase 6'),
+        builder: (_, _) => const CareerReportPage(),
       ),
       GoRoute(
         path: Routes.profile,
-        builder: (_, _) => const PlaceholderPage(title: 'Profile', phase: 'Phase 6'),
+        builder: (_, _) => const ProfilePage(),
       ),
       GoRoute(
         path: Routes.settings,
-        builder: (_, _) => const PlaceholderPage(title: 'Settings', phase: 'Phase 6'),
+        builder: (_, _) => const SettingsPage(),
       ),
     ],
   );

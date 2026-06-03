@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/auth_controller.dart';
+import '../i18n/language_switcher.dart';
 import '../router/app_router.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_gradients.dart';
@@ -36,9 +37,14 @@ class EduBotAppBar extends ConsumerWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             GestureDetector(onTap: () => context.go(Routes.recommendations), child: const BrandLogo()),
-            if (showProfile && user != null)
-              GestureDetector(
-                onTap: () => context.push(Routes.profile),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const LanguageSwitcher(compact: true),
+                if (showProfile && user != null) ...[
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => context.push(Routes.profile),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
@@ -62,7 +68,10 @@ class EduBotAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     ],
                   ),
                 ),
-              ),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       ),

@@ -317,11 +317,76 @@ class Expert {
       {'name': name, 'designation': designation, 'company': company, 'experience': experience, 'advice': advice};
 }
 
+class SkillItem {
+  const SkillItem({required this.name, this.description = '', this.courseUrl = '', this.videoUrl = ''});
+  final String name, description, courseUrl, videoUrl;
+  factory SkillItem.fromJson(Map j) => SkillItem(
+        name: (j['name'] ?? '') as String,
+        description: (j['description'] ?? '') as String,
+        courseUrl: (j['courseUrl'] ?? j['course_url'] ?? '') as String,
+        videoUrl: (j['videoUrl'] ?? j['video_url'] ?? '') as String,
+      );
+  Map<String, dynamic> toJson() =>
+      {'name': name, 'description': description, 'courseUrl': courseUrl, 'videoUrl': videoUrl};
+}
+
+class SkillsLearning {
+  const SkillsLearning({this.high = const [], this.medium = const [], this.low = const []});
+  final List<SkillItem> high, medium, low;
+  factory SkillsLearning.fromJson(Map j) => SkillsLearning(
+        high: _mapList(j['high'], SkillItem.fromJson),
+        medium: _mapList(j['medium'], SkillItem.fromJson),
+        low: _mapList(j['low'], SkillItem.fromJson),
+      );
+  Map<String, dynamic> toJson() => {
+        'high': high.map((e) => e.toJson()).toList(),
+        'medium': medium.map((e) => e.toJson()).toList(),
+        'low': low.map((e) => e.toJson()).toList(),
+      };
+  bool get isEmpty => high.isEmpty && medium.isEmpty && low.isEmpty;
+}
+
+class RoadmapPhase {
+  const RoadmapPhase({
+    required this.title,
+    this.goals = const [],
+    this.tasks = const [],
+    this.progressIndicators = const [],
+  });
+  final String title;
+  final List<String> goals, tasks, progressIndicators;
+  factory RoadmapPhase.fromJson(Map j) => RoadmapPhase(
+        title: (j['title'] ?? '') as String,
+        goals: _strList(j['goals']),
+        tasks: _strList(j['tasks']),
+        progressIndicators: _strList(j['progressIndicators'] ?? j['progress_indicators']),
+      );
+  Map<String, dynamic> toJson() =>
+      {'title': title, 'goals': goals, 'tasks': tasks, 'progressIndicators': progressIndicators};
+}
+
+class Roadmap90Days {
+  const Roadmap90Days({this.totalDuration = '', this.overview = '', this.phases = const []});
+  final String totalDuration;
+  final String overview;
+  final List<RoadmapPhase> phases;
+  factory Roadmap90Days.fromJson(Map j) => Roadmap90Days(
+        totalDuration: (j['totalDuration'] ?? j['total_duration'] ?? '') as String,
+        overview: (j['overview'] ?? '') as String,
+        phases: _mapList(j['phases'], RoadmapPhase.fromJson),
+      );
+  Map<String, dynamic> toJson() =>
+      {'totalDuration': totalDuration, 'overview': overview, 'phases': phases.map((e) => e.toJson()).toList()};
+  bool get isEmpty => phases.isEmpty;
+}
+
 class JobDetail {
   const JobDetail({
     required this.roleId,
     this.overview = const Overview(),
     this.careerPathway = const CareerPathway(),
+    this.skillsLearning = const SkillsLearning(),
+    this.roadmap90Days = const Roadmap90Days(),
     this.topInstitutes = const TopInstitutes(),
     this.feesInvestment = const FeesInvestment(),
     this.scholarships = const Scholarships(),
@@ -334,6 +399,8 @@ class JobDetail {
   final String roleId;
   final Overview overview;
   final CareerPathway careerPathway;
+  final SkillsLearning skillsLearning;
+  final Roadmap90Days roadmap90Days;
   final TopInstitutes topInstitutes;
   final FeesInvestment feesInvestment;
   final Scholarships scholarships;
@@ -350,6 +417,8 @@ class JobDetail {
         roleId: roleId,
         overview: j['overview'] is Map ? Overview.fromJson(j['overview'] as Map) : const Overview(),
         careerPathway: j['careerPathway'] is Map ? CareerPathway.fromJson(j['careerPathway'] as Map) : const CareerPathway(),
+        skillsLearning: j['skillsLearning'] is Map ? SkillsLearning.fromJson(j['skillsLearning'] as Map) : const SkillsLearning(),
+        roadmap90Days: j['roadmap90Days'] is Map ? Roadmap90Days.fromJson(j['roadmap90Days'] as Map) : const Roadmap90Days(),
         topInstitutes: j['topInstitutes'] is Map ? TopInstitutes.fromJson(j['topInstitutes'] as Map) : const TopInstitutes(),
         feesInvestment: j['feesInvestment'] is Map ? FeesInvestment.fromJson(j['feesInvestment'] as Map) : const FeesInvestment(),
         scholarships: j['scholarships'] is Map ? Scholarships.fromJson(j['scholarships'] as Map) : const Scholarships(),
@@ -362,6 +431,8 @@ class JobDetail {
   Map<String, dynamic> toJson() => {
         'overview': overview.toJson(),
         'careerPathway': careerPathway.toJson(),
+        'skillsLearning': skillsLearning.toJson(),
+        'roadmap90Days': roadmap90Days.toJson(),
         'topInstitutes': topInstitutes.toJson(),
         'feesInvestment': feesInvestment.toJson(),
         'scholarships': scholarships.toJson(),
@@ -374,6 +445,8 @@ class JobDetail {
   JobDetail copyWith({
     Overview? overview,
     CareerPathway? careerPathway,
+    SkillsLearning? skillsLearning,
+    Roadmap90Days? roadmap90Days,
     TopInstitutes? topInstitutes,
     FeesInvestment? feesInvestment,
     Scholarships? scholarships,
@@ -386,6 +459,8 @@ class JobDetail {
         roleId: roleId,
         overview: overview ?? this.overview,
         careerPathway: careerPathway ?? this.careerPathway,
+        skillsLearning: skillsLearning ?? this.skillsLearning,
+        roadmap90Days: roadmap90Days ?? this.roadmap90Days,
         topInstitutes: topInstitutes ?? this.topInstitutes,
         feesInvestment: feesInvestment ?? this.feesInvestment,
         scholarships: scholarships ?? this.scholarships,

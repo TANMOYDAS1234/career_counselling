@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# The Python backend lives here locally but is version-controlled in its own
+# repo (Career_counselling-_backend) and deployed on Render — keep it out of the
+# app repo so CI builds only the Flutter app.
+/backend/
+
+# Secrets — never commit
+*.env
+.env

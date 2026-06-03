@@ -8,9 +8,10 @@ import '../../core/providers/core_providers.dart';
 import '../../models/onboarding_data.dart';
 import '../auth/auth_controller.dart';
 import 'data/onboarding_questions.dart';
+import 'games/games_models.dart';
 import 'models/question.dart';
 
-enum OnboardingStage { basicInfo, question, feedback }
+enum OnboardingStage { basicInfo, question, feedback, games }
 
 class OnboardingState {
   const OnboardingState({
@@ -210,15 +211,30 @@ class OnboardingController extends Notifier<OnboardingState> {
       "Great progress! Your answers are helping us understand how you think and what you value. Let's keep going.";
 
   /// Continue past a module-feedback screen.
-  /// Returns true when the whole assessment is complete (caller should submit).
+  /// Returns true when the questionnaire is complete AND the games are done
+  /// (caller should submit). After the last module, routes into the aptitude
+  /// games stage instead of submitting immediately.
   bool continueAfterFeedback() {
-    if (state.currentQuestion >= 20) return true;
+    if (state.currentQuestion >= 20) {
+      state = state.copyWith(stage: OnboardingStage.games, clearFeedback: true);
+      return false;
+    }
     state = state.copyWith(
       stage: OnboardingStage.question,
       currentQuestion: state.currentQuestion + 1,
       clearFeedback: true,
     );
     return false;
+  }
+
+  /// Merges aptitude-game scores + persistence telemetry into the answers,
+  /// to be saved with the questionnaire on submit.
+  void applyGameOutcome(GameOutcome outcome) {
+    final next = Map<String, dynamic>.from(state.answers);
+    outcome.toAnswers().forEach((k, v) {
+      if (v != null) next[k] = v;
+    });
+    state = state.copyWith(answers: next);
   }
 
   /// Persist the full questionnaire. Returns true on success.

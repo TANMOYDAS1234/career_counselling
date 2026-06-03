@@ -721,6 +721,186 @@ class ExpertsSection extends StatelessWidget {
   }
 }
 
+class SkillsSection extends StatelessWidget {
+  const SkillsSection(this.s, {super.key});
+  final SkillsLearning s;
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = <(String, Color, List<SkillItem>)>[
+      ('High Priority', AppColors.primary600, s.high),
+      ('Medium Priority', AppColors.secondary600, s.medium),
+      ('Good to Have', AppColors.accent600, s.low),
+    ].where((g) => g.$3.isNotEmpty).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle(Icons.school_outlined, 'Skills & Learning'),
+        for (final (label, color, list) in groups) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+                const SizedBox(width: 8),
+                Text(label, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.neutral800)),
+              ],
+            ),
+          ),
+          for (final skill in list) _SkillCard(skill, color).paddedBottom(),
+        ],
+      ],
+    );
+  }
+}
+
+class _SkillCard extends StatelessWidget {
+  const _SkillCard(this.s, this.color);
+  final SkillItem s;
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.s2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(s.name, style: Theme.of(context).textTheme.titleMedium),
+          if (s.description.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(s.description, style: const TextStyle(fontSize: 13, color: AppColors.neutral600, height: 1.4)),
+            ),
+          Row(
+            children: [
+              if (s.courseUrl.isNotEmpty && s.courseUrl != '#') _LinkButton('Course', s.courseUrl),
+              if (s.videoUrl.isNotEmpty && s.videoUrl != '#') ...[
+                const SizedBox(width: AppSpacing.s2),
+                TextButton.icon(
+                  onPressed: () => _openUrl(s.videoUrl),
+                  icon: const Icon(Icons.play_circle_outline_rounded, size: 16),
+                  label: const Text('Video'),
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: AppColors.destructive),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RoadmapSection extends StatelessWidget {
+  const RoadmapSection(this.r, {super.key});
+  final Roadmap90Days r;
+
+  static const _phaseColors = [AppColors.primary600, AppColors.secondary600, AppColors.accent600];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle(Icons.map_outlined, '90-Day Roadmap'),
+        if (r.overview.isNotEmpty || r.totalDuration.isNotEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.s3),
+            margin: const EdgeInsets.only(bottom: AppSpacing.s2),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [AppColors.primary50, AppColors.accent50]),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: AppColors.primary200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (r.totalDuration.isNotEmpty)
+                  Text(r.totalDuration,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primary700)),
+                if (r.overview.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(r.overview, style: const TextStyle(fontSize: 13, color: AppColors.neutral600, height: 1.4)),
+                ],
+              ],
+            ),
+          ),
+        for (var i = 0; i < r.phases.length; i++)
+          _PhaseCard(phase: r.phases[i], color: _phaseColors[i % _phaseColors.length], index: i).paddedBottom(),
+      ],
+    );
+  }
+}
+
+class _PhaseCard extends StatelessWidget {
+  const _PhaseCard({required this.phase, required this.color, required this.index});
+  final RoadmapPhase phase;
+  final Color color;
+  final int index;
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                alignment: Alignment.center,
+                child: Text('${index + 1}',
+                    style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 13)),
+              ),
+              const SizedBox(width: AppSpacing.s2),
+              Expanded(child: Text(phase.title, style: Theme.of(context).textTheme.titleMedium)),
+            ],
+          ),
+          if (phase.goals.isNotEmpty) _PhaseGroup('Goals', phase.goals, Icons.flag_outlined, color),
+          if (phase.tasks.isNotEmpty) _PhaseGroup('Tasks', phase.tasks, Icons.task_alt_rounded, color),
+          if (phase.progressIndicators.isNotEmpty)
+            _PhaseGroup('Progress markers', phase.progressIndicators, Icons.check_circle_outline_rounded, color),
+        ],
+      ),
+    );
+  }
+}
+
+class _PhaseGroup extends StatelessWidget {
+  const _PhaseGroup(this.label, this.items, this.icon, this.color);
+  final String label;
+  final List<String> items;
+  final IconData icon;
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.s2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.neutral500)),
+          const SizedBox(height: 6),
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(icon, size: 16, color: color),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(item, style: const TextStyle(height: 1.4, color: AppColors.neutral700))),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 extension _PaddedBottom on Widget {
   Widget paddedBottom() => Padding(padding: const EdgeInsets.only(bottom: AppSpacing.s2), child: this);
 }

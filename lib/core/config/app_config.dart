@@ -1,18 +1,20 @@
 /// Global app configuration.
 ///
-/// The backend is the existing Flask server (see ../career_counselling/backend).
-/// On the Android emulator, `10.0.2.2` maps to the host machine's `localhost`.
-/// On the iOS simulator, use `http://localhost:8080`.
-/// On a physical device, pass your dev machine's LAN IP, e.g.:
+/// The backend is the Flask server in `backend/`, deployed on Render and backed
+/// by MongoDB Atlas. The default points at the live cloud server, so the app
+/// works on any device, anywhere, with no LAN setup.
 ///
-///   flutter run --dart-define=API_BASE_URL=http://192.168.1.42:8080
+/// To target a backend running on your own machine instead, override at build:
+///   `flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080`   (Android emulator)
+///   `flutter run --dart-define=API_BASE_URL=http://YOUR-PC-LAN-IP:8080` (physical device)
 class AppConfig {
   AppConfig._();
 
-  /// Base URL of the Flask backend. Override per-environment with --dart-define.
+  /// Base URL of the backend. Defaults to the deployed Render service;
+  /// override per-environment with --dart-define=API_BASE_URL=...
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8080',
+    defaultValue: 'https://career-counselling-backend-ku30.onrender.com',
   );
 
   /// Network timeouts.

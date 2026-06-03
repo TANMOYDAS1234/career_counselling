@@ -7,16 +7,16 @@ import '../../models/job_detail.dart';
 class JobDetailParser {
   static final _inr = NumberFormat('#,##,##0', 'en_IN');
 
-  /// The sections the backend generates (skills/roadmap are disabled upstream).
+  /// The section types the backend generates, in display order.
   static const sections = [
-    'overview', 'pathway', 'institute', 'fees',
+    'overview', 'pathway', 'skills', 'roadmap', 'institute', 'fees',
     'scholarships', 'jobmarket', 'certifications', 'salary', 'experts',
   ];
 
   /// Normalized JobDetail keys as returned by /api/load-job-role.
   static const sectionsServerKeys = [
-    'overview', 'careerPathway', 'topInstitutes', 'feesInvestment',
-    'scholarships', 'jobMarket', 'certifications', 'salaryGrowth', 'industryExperts',
+    'overview', 'careerPathway', 'skillsLearning', 'roadmap90Days', 'topInstitutes',
+    'feesInvestment', 'scholarships', 'jobMarket', 'certifications', 'salaryGrowth', 'industryExperts',
   ];
 
   static String usdToInr(String s) {
@@ -37,6 +37,10 @@ class JobDetailParser {
         return _overview(d, c);
       case 'pathway':
         return _pathway(d, c);
+      case 'skills':
+        return _skills(d, c);
+      case 'roadmap':
+        return _roadmap(d, c);
       case 'institute':
         return _institute(d, c);
       case 'fees':
@@ -95,6 +99,50 @@ class JobDetailParser {
     }).where((s) => s.phase.trim().isNotEmpty).toList();
     if (steps.isEmpty) return d;
     return d.copyWith(careerPathway: CareerPathway(currentLevel: d.careerPathway.currentLevel, steps: steps));
+  }
+
+  static JobDetail _skills(JobDetail d, Map c) {
+    final s = c['skills'] as Map? ?? const {};
+    List<SkillItem> map(dynamic v) => (v is List ? v : const [])
+        .whereType<Map>()
+        .map((e) => SkillItem(
+              name: (e['name'] ?? '') as String,
+              description: (e['description'] ?? '') as String,
+              courseUrl: (e['course_url'] ?? e['courseUrl'] ?? '') as String,
+              videoUrl: (e['video_url'] ?? e['videoUrl'] ?? '') as String,
+            ))
+        .where((x) => x.name.trim().isNotEmpty)
+        .toList();
+    final sl = SkillsLearning(high: map(s['high']), medium: map(s['medium']), low: map(s['low']));
+    if (sl.isEmpty) return d;
+    return d.copyWith(skillsLearning: sl);
+  }
+
+  static JobDetail _roadmap(JobDetail d, Map c) {
+    final r = c['roadmap'] as Map? ?? const {};
+    RoadmapPhase? phase(String key) {
+      final p = r[key];
+      if (p is! Map) return null;
+      return RoadmapPhase(
+        title: (p['title'] ?? '') as String,
+        goals: _strList(p['goals']),
+        tasks: _strList(p['tasks']),
+        progressIndicators: _strList(p['progress_indicators'] ?? p['progressIndicators']),
+      );
+    }
+
+    final phases = [for (final k in ['phase1', 'phase2', 'phase3']) phase(k)]
+        .whereType<RoadmapPhase>()
+        .where((p) => p.title.trim().isNotEmpty || p.goals.isNotEmpty || p.tasks.isNotEmpty)
+        .toList();
+    if (phases.isEmpty) return d;
+    return d.copyWith(
+      roadmap90Days: Roadmap90Days(
+        totalDuration: (r['total_duration'] ?? r['totalDuration'] ?? '') as String,
+        overview: (r['overview'] ?? '') as String,
+        phases: phases,
+      ),
+    );
   }
 
   static Institute _inst(Map i, {String fallbackEligibility = 'Not specified'}) => Institute(

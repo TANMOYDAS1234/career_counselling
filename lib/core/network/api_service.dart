@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -161,6 +163,36 @@ class ApiService {
       return (res['translations'] as List).map((e) => e.toString()).toList();
     }
     return texts;
+  }
+
+  // ── PDF ─────────────────────────────────────────────────────────────────
+  /// Generates the career-report PDF on the backend (Playwright) and returns
+  /// the raw bytes. [detailData] is the normalized job-detail map
+  /// ([JobDetail.toJson]); the backend renders it via its report template.
+  Future<Uint8List> generatePdf({
+    required String roleId,
+    required String roleTitle,
+    required String targetLanguage,
+    required Map<String, dynamic> detailData,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/api/generate-pdf',
+        data: {
+          'roleId': roleId,
+          'roleTitle': roleTitle,
+          'targetLanguage': targetLanguage,
+          'translatedData': detailData,
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final data = res.data;
+      if (data is List<int>) return Uint8List.fromList(data);
+      if (data is Uint8List) return data;
+      throw const ApiException('The server did not return a PDF.');
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
   }
 }
 

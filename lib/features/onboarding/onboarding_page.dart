@@ -6,6 +6,8 @@ import '../../core/router/app_router.dart';
 import '../../core/widgets/app_background.dart';
 import '../../core/widgets/brand.dart';
 import 'data/onboarding_questions.dart';
+import 'games/aptitude_flow.dart';
+import 'games/games_models.dart';
 import 'onboarding_controller.dart';
 import 'widgets/basic_info_step.dart';
 import 'widgets/feedback_view.dart';
@@ -29,6 +31,12 @@ class OnboardingPage extends ConsumerWidget {
       if (ok && context.mounted) context.go(Routes.recommendations);
     }
 
+    Future<void> handleGamesComplete(GameOutcome outcome) async {
+      controller.applyGameOutcome(outcome);
+      final ok = await controller.submit();
+      if (ok && context.mounted) context.go(Routes.recommendations);
+    }
+
     final (title, subtitle) = _headerLabels(state);
 
     return Scaffold(
@@ -42,7 +50,13 @@ class OnboardingPage extends ConsumerWidget {
               ),
               if (state.stage != OnboardingStage.basicInfo)
                 WizardHeader(progress: state.progress, title: title, subtitle: subtitle),
-              Expanded(child: _Body(stage: state.stage, onContinue: handleContinue)),
+              Expanded(
+                child: _Body(
+                  stage: state.stage,
+                  onContinue: handleContinue,
+                  onGamesComplete: handleGamesComplete,
+                ),
+              ),
               if (state.submitting)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16),
@@ -63,9 +77,10 @@ class OnboardingPage extends ConsumerWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.stage, required this.onContinue});
+  const _Body({required this.stage, required this.onContinue, required this.onGamesComplete});
   final OnboardingStage stage;
   final VoidCallback onContinue;
+  final void Function(GameOutcome) onGamesComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +88,10 @@ class _Body extends StatelessWidget {
       OnboardingStage.basicInfo => const BasicInfoStep(),
       OnboardingStage.question => const QuestionView(),
       OnboardingStage.feedback => FeedbackView(onContinue: onContinue),
+      OnboardingStage.games => SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+          child: AptitudeFlow(onComplete: onGamesComplete),
+        ),
     };
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),

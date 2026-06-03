@@ -1,0 +1,49 @@
+# Codemagic CI/CD — the easiest way to build this app (incl. a SIGNED, installable
+# iOS app) without owning a Mac. Connect this repo at https://codemagic.io, then
+# run a workflow below. Docs: https://docs.codemagic.io/yaml/yaml-getting-started/
+#
+# • android-workflow  → release APK (installable on any Android phone), no setup.
+# • ios-workflow      → signed .ipa. REQUIRES a paid Apple Developer account:
+#     1. Codemagic → Teams → Integrations → Apple Developer Portal → add an
+#        App Store Connect API key (name it, e.g., "AppStoreConnect").
+#     2. Put that integration name under `app_store_connect` below.
+#   Apple's signing is mandatory to install on a real iPhone — there is no
+#   free way around it for device installs.
+
+workflows:
+  android-workflow:
+    name: Android
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: stable
+    scripts:
+      - name: Get packages
+        script: flutter pub get
+      - name: Build APK
+        script: flutter build apk --release
+    artifacts:
+      - build/**/outputs/**/*.apk
+
+  ios-workflow:
+    name: iOS
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: AppStoreConnect   # <-- name of your Codemagic ASC API key integration
+    environment:
+      flutter: stable
+      ios_signing:
+        distribution_type: ad_hoc          # ad_hoc (test devices) | development | app_store
+        bundle_identifier: com.edubot.careerCounsellingApp
+    scripts:
+      - name: Get packages
+        script: flutter pub get
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          xcode-project use-profiles
+      - name: Build signed IPA
+        script: flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa

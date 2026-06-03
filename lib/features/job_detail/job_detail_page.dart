@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
+import '../../core/i18n/language_controller.dart';
+import '../../core/network/api_exception.dart';
 import '../../core/network/api_service.dart';
 import '../../core/providers/core_providers.dart';
 import '../../core/theme/app_colors.dart';
@@ -15,6 +21,8 @@ import 'widgets/job_detail_sections.dart';
 const _navItems = <(String, IconData)>[
   ('Overview', Icons.description_outlined),
   ('Pathway', Icons.timeline_rounded),
+  ('Skills', Icons.school_outlined),
+  ('Roadmap', Icons.map_outlined),
   ('Institutes', Icons.account_balance_outlined),
   ('Fees', Icons.currency_rupee_rounded),
   ('Aid', Icons.savings_outlined),
@@ -53,10 +61,54 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
     super.dispose();
   }
 
-  void _comingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PDF download arrives in the next phase.')),
-    );
+  bool _downloadingPdf = false;
+
+  Future<void> _downloadPdf() async {
+    final s = _controller.state;
+    if (_downloadingPdf) return;
+    if (!s.done) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please wait — the report is still being generated.')),
+      );
+      return;
+    }
+    setState(() => _downloadingPdf = true);
+    final messenger = ScaffoldMessenger.of(context)
+      ..showSnackBar(const SnackBar(
+        content: Text('Generating PDF…'),
+        duration: Duration(minutes: 1),
+      ));
+    try {
+      final api = ref.read(apiServiceProvider);
+      final lang = ref.read(languageProvider);
+      final bytes = await api.generatePdf(
+        roleId: widget.roleId,
+        roleTitle: s.roleTitle,
+        targetLanguage: lang,
+        detailData: s.detail.toJson(),
+      );
+      final dir = await getApplicationDocumentsDirectory();
+      final safe = s.roleTitle.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-');
+      final file = File('${dir.path}/EduBot-Career-Report-$safe.pdf');
+      await file.writeAsBytes(bytes, flush: true);
+      messenger.hideCurrentSnackBar();
+      final res = await OpenFilex.open(file.path);
+      if (res.type != ResultType.done && mounted) {
+        messenger.showSnackBar(SnackBar(content: Text('Saved to ${file.path}')));
+      }
+    } on ApiException catch (e) {
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: AppColors.destructive),
+      );
+    } catch (_) {
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Could not generate the PDF.'), backgroundColor: AppColors.destructive),
+      );
+    } finally {
+      if (mounted) setState(() => _downloadingPdf = false);
+    }
   }
 
   @override
@@ -70,7 +122,7 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
             final s = _controller.state;
             return Column(
               children: [
-                _Header(title: s.roleTitle, onPdf: _comingSoon),
+                _Header(title: s.roleTitle, onPdf: _downloadPdf, busy: _downloadingPdf),
                 if (!s.done) _ProgressBanner(loaded: s.loaded, total: s.total),
                 _SectionNav(selected: _section, onSelect: (i) => setState(() => _section = i)),
                 Expanded(
@@ -89,9 +141,10 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.title, required this.onPdf});
+  const _Header({required this.title, required this.onPdf, this.busy = false});
   final String title;
   final VoidCallback onPdf;
+  final bool busy;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -105,8 +158,13 @@ class _Header extends StatelessWidget {
                 style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w800)),
           ),
           IconButton(
-            onPressed: onPdf,
-            icon: const Icon(Icons.download_rounded, color: AppColors.white),
+            onPressed: busy ? null : onPdf,
+            icon: busy
+                ? const SizedBox(
+                    width: 22, height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2.4, color: AppColors.white),
+                  )
+                : const Icon(Icons.download_rounded, color: AppColors.white),
             tooltip: 'Download PDF',
           ),
         ],
@@ -197,6 +255,8 @@ class _SectionContent extends StatelessWidget {
     final widgets = <Widget>[
       OverviewSection(d.overview),
       PathwaySection(d.careerPathway),
+      SkillsSection(d.skillsLearning),
+      RoadmapSection(d.roadmap90Days),
       InstitutesSection(d.topInstitutes),
       FeesSection(d.feesInvestment),
       ScholarshipsSection(d.scholarships),
@@ -208,6 +268,8 @@ class _SectionContent extends StatelessWidget {
     final empty = <bool>[
       d.overview.description.isEmpty && d.overview.keyResponsibilities.isEmpty,
       d.careerPathway.steps.isEmpty,
+      d.skillsLearning.isEmpty,
+      d.roadmap90Days.isEmpty,
       d.topInstitutes.isEmpty,
       d.feesInvestment.totalRange.isEmpty && d.feesInvestment.breakdown.isEmpty,
       d.scholarships.isEmpty,

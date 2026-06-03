@@ -13,7 +13,7 @@ class JobDetailState {
     required this.detail,
     required this.roleTitle,
     this.loaded = 0,
-    this.total = 9,
+    this.total = 11,
     this.done = false,
     this.fromCache = false,
     this.error,
@@ -119,7 +119,7 @@ class JobDetailController extends ChangeNotifier {
         final server = await api.loadJobRole(username!, roleId);
         if (server != null) {
           final present = JobDetailParser.sectionsServerKeys.where((k) => server[k] != null).length;
-          if (present >= 8) {
+          if (present >= 10) {
             final detail = JobDetail.fromServerJson(roleId, server);
             await storage.setJobDetailRaw(roleId, jsonEncode(detail.toJson()));
             _set(_state.copyWith(detail: detail, loaded: _state.total, done: true, fromCache: true));

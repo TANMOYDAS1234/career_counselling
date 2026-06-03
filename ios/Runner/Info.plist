@@ -8,7 +8,16 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>EduBot</string>
-	<!-- Dev only: allow plain HTTP to the local Flask backend. Tighten for release. -->
+	<!-- image_picker: required so iOS can show the photo/camera permission prompt
+	     when the user updates their profile picture. -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>EduBot needs access to your photos so you can set a profile picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>EduBot needs camera access if you want to take a new profile picture.</string>
+	<!-- The default backend is HTTPS (Render), which satisfies App Transport
+	     Security. NSAllowsArbitraryLoads is kept only so you can point the app at
+	     a plain-HTTP backend on your LAN during development; remove it before
+	     submitting to the App Store. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
