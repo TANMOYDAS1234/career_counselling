@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/gradient_button.dart';
@@ -182,18 +183,18 @@ class _ConstraintGridState extends State<ConstraintGrid> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Constraint Grid',
+                  TranslatedText('Constraint Grid',
                       style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
-                  const Text('Each row and column must have each color and letter exactly once',
+                  const TranslatedText('Each row and column must have each color and letter exactly once',
                       style: TextStyle(fontSize: 12, color: AppColors.neutral500)),
                 ],
               ),
             ),
             Column(
               children: [
-                Text('$progress%',
+                TranslatedText('$progress%',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: _violet600)),
-                const Text('filled', style: TextStyle(fontSize: 11, color: AppColors.neutral500)),
+                const TranslatedText('filled', style: TextStyle(fontSize: 11, color: AppColors.neutral500)),
               ],
             ),
           ],
@@ -224,7 +225,7 @@ class _ConstraintGridState extends State<ConstraintGrid> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Select color + letter:',
+                const TranslatedText('Select color + letter:',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _violet700)),
                 const SizedBox(height: 6),
                 GridView.count(
@@ -247,8 +248,8 @@ class _ConstraintGridState extends State<ConstraintGrid> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(_cgColors[(v / 4).ceil() - 1], style: const TextStyle(fontSize: 13)),
-                              Text(_cgSymbols[(v - 1) % 4],
+                              TranslatedText(_cgColors[(v / 4).ceil() - 1], style: const TextStyle(fontSize: 13)),
+                              TranslatedText(_cgSymbols[(v - 1) % 4],
                                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.neutral700)),
                             ],
                           ),
@@ -267,7 +268,7 @@ class _ConstraintGridState extends State<ConstraintGrid> {
               child: OutlinedButton.icon(
                 onPressed: (_selected == null || _hintUsed) ? null : _handleHint,
                 icon: const Icon(Icons.lightbulb_outline_rounded, size: 18, color: AppColors.amber600),
-                label: Text(_hintUsed ? 'Hint used' : 'Hint', style: const TextStyle(color: AppColors.amber600)),
+                label: TranslatedText(_hintUsed ? 'Hint used' : 'Hint', style: const TextStyle(color: AppColors.amber600)),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(46),
                   side: const BorderSide(color: AppColors.amber600),
@@ -279,7 +280,7 @@ class _ConstraintGridState extends State<ConstraintGrid> {
               child: OutlinedButton(
                 onPressed: () => _finalize(_grid, _shutdownFlag),
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                child: const Text("I'm done", style: TextStyle(color: AppColors.neutral500)),
+                child: const TranslatedText("I'm done", style: TextStyle(color: AppColors.neutral500)),
               ),
             ),
           ],
@@ -325,10 +326,10 @@ class _ConstraintGridState extends State<ConstraintGrid> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: val != null
               ? [
-                  Text(color!, style: const TextStyle(fontSize: 16)),
-                  Text(symbol!, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.neutral700)),
+                  TranslatedText(color!, style: const TextStyle(fontSize: 16)),
+                  TranslatedText(symbol!, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.neutral700)),
                 ]
-              : const [Text('?', style: TextStyle(fontSize: 18, color: AppColors.neutral300))],
+              : const [TranslatedText('?', style: TextStyle(fontSize: 18, color: AppColors.neutral300))],
         ),
       ),
     );
@@ -345,14 +346,14 @@ class _ConstraintGridState extends State<ConstraintGrid> {
             borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           alignment: Alignment.center,
-          child: const Text('🧩', style: TextStyle(fontSize: 30)),
+          child: const TranslatedText('🧩', style: TextStyle(fontSize: 30)),
         ),
         const SizedBox(height: AppSpacing.s3),
-        Text('Constraint Grid',
+        TranslatedText('Constraint Grid',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
         const SizedBox(height: AppSpacing.s2),
-        const Text(
+        const TranslatedText(
           'A 4×4 grid of colored symbols. Each row and each column must contain each color and each letter exactly once. Some cells are already filled. Find the right cells to complete it.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 14, color: AppColors.neutral600, height: 1.5),
@@ -365,7 +366,7 @@ class _ConstraintGridState extends State<ConstraintGrid> {
             borderRadius: BorderRadius.circular(AppRadius.sm),
             border: Border.all(color: _violet200),
           ),
-          child: const Text(
+          child: const TranslatedText(
             'Tap an empty cell, then choose the color + letter that fits. A hint is available if you get stuck.',
             style: TextStyle(fontSize: 13, color: _violet700),
           ),
@@ -377,7 +378,7 @@ class _ConstraintGridState extends State<ConstraintGrid> {
               child: OutlinedButton(
                 onPressed: widget.onSkip,
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                child: const Text('Skip', style: TextStyle(color: AppColors.neutral500)),
+                child: const TranslatedText('Skip', style: TextStyle(color: AppColors.neutral500)),
               ),
             ),
             const SizedBox(width: AppSpacing.s1),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -38,7 +39,7 @@ class FeedbackView extends ConsumerWidget {
               child: const Icon(Icons.auto_awesome, color: AppColors.white, size: 30),
             ),
             const SizedBox(height: AppSpacing.s2),
-            Text("Here's what we noticed", style: Theme.of(context).textTheme.titleLarge),
+            TranslatedText("Here's what we noticed", style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: AppSpacing.s3),
             Container(
               width: double.infinity,
@@ -52,11 +53,11 @@ class FeedbackView extends ConsumerWidget {
                       children: [
                         const CircularProgressIndicator(color: AppColors.primary600),
                         const SizedBox(height: AppSpacing.s2),
-                        Text('Analysing your answers...',
+                        TranslatedText('Analysing your answers...',
                             style: TextStyle(color: AppColors.primary600, fontWeight: FontWeight.w600)),
                       ],
                     )
-                  : Text(
+                  : TranslatedText(
                       state.feedbackMessage ?? '',
                       style: const TextStyle(fontSize: 16, height: 1.55, color: AppColors.neutral700),
                     ),

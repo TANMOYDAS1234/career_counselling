@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
@@ -70,7 +71,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
     if (!formOk || !selectionsOk || !_consent) {
       if (!selectionsOk) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select your class and board.')),
+          const SnackBar(content: TranslatedText('Please select your class and board.')),
         );
       }
       return;
@@ -98,9 +99,9 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Tell us about you', style: Theme.of(context).textTheme.headlineSmall),
+            TranslatedText('Tell us about you', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 4),
-            const Text('A few basics before we begin the assessment',
+            const TranslatedText('A few basics before we begin the assessment',
                 style: TextStyle(color: AppColors.neutral600)),
             const SizedBox(height: AppSpacing.s3),
             AppCard(
@@ -176,7 +177,7 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: Text(text,
+        child: TranslatedText(text,
             style: const TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.neutral800)),
       );
@@ -195,8 +196,8 @@ class _ChipWrap extends StatelessWidget {
       runSpacing: AppSpacing.s1,
       children: [
         for (final (value, label) in options)
-          SizedBox(
-            width: 104,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 100),
             child: ChoiceChipCard(
               label: label,
               selected: selected == value,
@@ -234,7 +235,7 @@ class _ConsentRow extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.s1),
             const Expanded(
-              child: Text(
+              child: TranslatedText(
                 'I confirm a parent/guardian consents to this assessment.',
                 style: TextStyle(fontSize: 13, color: AppColors.neutral600),
               ),
@@ -244,7 +245,7 @@ class _ConsentRow extends StatelessWidget {
         if (showError)
           const Padding(
             padding: EdgeInsets.only(left: 32, top: 2),
-            child: Text('Consent is required to continue.',
+            child: TranslatedText('Consent is required to continue.',
                 style: TextStyle(fontSize: 12, color: AppColors.destructive)),
           ),
       ],

@@ -6,8 +6,8 @@ import '../../features/auth/auth_controller.dart';
 import '../i18n/language_switcher.dart';
 import '../router/app_router.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_gradients.dart';
 import 'brand.dart';
+import 'user_avatar.dart';
 
 /// Sticky top bar for authenticated screens: brand + profile chip
 /// (the web Navbar, adapted to mobile).
@@ -22,7 +22,6 @@ class EduBotAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).user;
-    final initials = _initials(user?.name ?? user?.email ?? '');
 
     return SafeArea(
       bottom: false,
@@ -55,13 +54,9 @@ class EduBotAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: const BoxDecoration(gradient: AppGradients.primary, shape: BoxShape.circle),
-                        alignment: Alignment.center,
-                        child: Text(initials,
-                            style: const TextStyle(color: AppColors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                      UserAvatar(
+                        imageData: user.profileImage,
+                        fallback: user.name ?? user.email,
                       ),
                       const SizedBox(width: 6),
                       Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.primary700),
@@ -76,12 +71,5 @@ class EduBotAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ),
     );
-  }
-
-  String _initials(String s) {
-    final parts = s.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
-    if (parts.isEmpty) return '?';
-    final letters = parts.map((p) => p[0]).take(2).join();
-    return letters.toUpperCase();
   }
 }

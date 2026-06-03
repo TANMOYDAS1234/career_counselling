@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/i18n/translated_text.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -101,16 +102,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           Wrap(
             alignment: WrapAlignment.center,
             children: [
-              const Text('Already have an account? ', style: TextStyle(color: AppColors.neutral600)),
+              const TranslatedText('Already have an account? ', style: TextStyle(color: AppColors.neutral600)),
               GestureDetector(
                 onTap: () => context.go(Routes.login),
-                child: const Text('Sign In',
+                child: const TranslatedText('Sign In',
                     style: TextStyle(color: AppColors.secondary600, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.s1),
-          const Text(
+          const TranslatedText(
             'By signing up, you agree to our Terms of Service and Privacy Policy',
             textAlign: TextAlign.center,
             style: TextStyle(color: AppColors.neutral400, fontSize: 11),

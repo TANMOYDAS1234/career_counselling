@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/i18n/translated_text.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
@@ -56,12 +57,12 @@ class _Header extends StatelessWidget {
           if (!isAuthed)
             TextButton(
               onPressed: () => context.push(Routes.login),
-              child: const Text('Login'),
+              child: const TranslatedText('Login'),
             )
           else
             TextButton(
               onPressed: () => context.go(Routes.recommendations),
-              child: const Text('Dashboard'),
+              child: const TranslatedText('Dashboard'),
             ),
         ],
       ),
@@ -89,14 +90,14 @@ class _Hero extends StatelessWidget {
         children: [
           const GradientPill(text: 'AI-Powered Career Guidance'),
           const SizedBox(height: AppSpacing.s3),
-          Text('Discover Your Ideal', textAlign: TextAlign.center, style: headline),
+          TranslatedText('Discover Your Ideal', textAlign: TextAlign.center, style: headline),
           ShaderMask(
             shaderCallback: (b) => AppGradients.heroText.createShader(b),
-            child: Text('Career Path with AI',
+            child: TranslatedText('Career Path with AI',
                 textAlign: TextAlign.center, style: headline.copyWith(color: Colors.white)),
           ),
           const SizedBox(height: AppSpacing.s2),
-          const Text(
+          const TranslatedText(
             'Get personalized career recommendations powered by advanced AI analysis of your interests, academic profile, and personality.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: AppColors.neutral600, height: 1.5),
@@ -140,9 +141,9 @@ class _FeaturePreview extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(title, style: Theme.of(context).textTheme.titleMedium),
+                          TranslatedText(title, style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(height: 4),
-                          Text(desc, style: const TextStyle(color: AppColors.neutral600)),
+                          TranslatedText(desc, style: const TextStyle(color: AppColors.neutral600)),
                         ],
                       ),
                     ),
@@ -173,9 +174,9 @@ class _HowItWorks extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSpacing.pageH, AppSpacing.s5, AppSpacing.pageH, AppSpacing.s5),
       child: Column(
         children: [
-          Text('How It Works', style: Theme.of(context).textTheme.headlineSmall),
+          TranslatedText('How It Works', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 6),
-          const Text('Your personalized career journey in 3 simple steps',
+          const TranslatedText('Your personalized career journey in 3 simple steps',
               textAlign: TextAlign.center, style: TextStyle(color: AppColors.neutral600)),
           const SizedBox(height: AppSpacing.s3),
           for (final (step, title, desc, icon) in _steps)
@@ -193,7 +194,7 @@ class _HowItWorks extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppRadius.md),
                       ),
                       alignment: Alignment.center,
-                      child: Text(step,
+                      child: TranslatedText(step,
                           style: GoogleFonts.poppins(
                               color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
                     ),
@@ -202,11 +203,11 @@ class _HowItWorks extends StatelessWidget {
                       children: [
                         Icon(icon, color: AppColors.neutral700),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium)),
+                        Expanded(child: TranslatedText(title, style: Theme.of(context).textTheme.titleMedium)),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(desc, style: const TextStyle(color: AppColors.neutral600, height: 1.5)),
+                    TranslatedText(desc, style: const TextStyle(color: AppColors.neutral600, height: 1.5)),
                   ],
                 ),
               ),
@@ -235,9 +236,9 @@ class _FeaturesOverview extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSpacing.pageH, AppSpacing.s5, AppSpacing.pageH, AppSpacing.s4),
       child: Column(
         children: [
-          Text('Everything You Need', style: Theme.of(context).textTheme.headlineSmall),
+          TranslatedText('Everything You Need', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 6),
-          const Text('Comprehensive career guidance platform',
+          const TranslatedText('Comprehensive career guidance platform',
               textAlign: TextAlign.center, style: TextStyle(color: AppColors.neutral600)),
           const SizedBox(height: AppSpacing.s3),
           GridView.builder(
@@ -259,10 +260,10 @@ class _FeaturesOverview extends StatelessWidget {
                   children: [
                     _IconTile(icon: icon, size: 44),
                     const SizedBox(height: AppSpacing.s1),
-                    Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 15)),
+                    TranslatedText(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 15)),
                     const SizedBox(height: 4),
                     Expanded(
-                      child: Text(desc,
+                      child: TranslatedText(desc,
                           style: const TextStyle(color: AppColors.neutral600, fontSize: 13, height: 1.4)),
                     ),
                   ],
@@ -293,12 +294,12 @@ class _CtaBand extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text('Ready to Discover Your Career Path?',
+            TranslatedText('Ready to Discover Your Career Path?',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                     color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: AppSpacing.s1),
-            Text('Join thousands of students who found their perfect career with EduBot',
+            TranslatedText('Join thousands of students who found their perfect career with EduBot',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white.withValues(alpha: 0.9))),
             const SizedBox(height: AppSpacing.s3),
@@ -328,10 +329,10 @@ class _Footer extends StatelessWidget {
         children: [
           const BrandLogo(onLight: false),
           const SizedBox(height: AppSpacing.s1),
-          const Text('AI-powered career guidance for students',
+          const TranslatedText('AI-powered career guidance for students',
               textAlign: TextAlign.center, style: TextStyle(color: AppColors.neutral400)),
           const SizedBox(height: AppSpacing.s3),
-          Text('© 2026 EduBot. All rights reserved.',
+          TranslatedText('© 2026 EduBot. All rights reserved.',
               style: TextStyle(color: AppColors.neutral400, fontSize: 12)),
         ],
       ),

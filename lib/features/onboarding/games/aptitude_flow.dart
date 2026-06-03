@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
@@ -216,11 +217,11 @@ class _Intro extends StatelessWidget {
           child: const Icon(Icons.sports_esports_rounded, color: AppColors.white, size: 32),
         ),
         const SizedBox(height: AppSpacing.s3),
-        Text('A few quick brain games',
+        TranslatedText('A few quick brain games',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
         const SizedBox(height: AppSpacing.s2),
-        const Text(
+        const TranslatedText(
           'Four short rounds (number, word, shape, and logic sense) plus a couple of puzzles. They measure how you think — not what you’ve memorised. There are no wrong choices that count against you.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 15, color: AppColors.neutral600, height: 1.5),
@@ -253,7 +254,7 @@ class _Feedback extends StatelessWidget {
             const Icon(Icons.auto_awesome_rounded, color: AppColors.primary600, size: 20),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(title,
+              child: TranslatedText(title,
                   style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
             ),
           ],
@@ -266,7 +267,7 @@ class _Feedback extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.sm),
             border: Border.all(color: AppColors.primary100),
           ),
-          child: Text(message, style: const TextStyle(fontSize: 14, color: AppColors.neutral800, height: 1.5)),
+          child: TranslatedText(message, style: const TextStyle(fontSize: 14, color: AppColors.neutral800, height: 1.5)),
         ),
         const SizedBox(height: AppSpacing.s3),
         GradientButton(label: buttonLabel, trailingIcon: Icons.arrow_forward_rounded, onPressed: onContinue),
@@ -284,7 +285,7 @@ class _PersistenceFeedback extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('How you handled the puzzle',
+        TranslatedText('How you handled the puzzle',
             style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
         const SizedBox(height: AppSpacing.s2),
         _row('Effort', result.effortRating),
@@ -311,9 +312,9 @@ class _PersistenceFeedback extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.accent700)),
+          TranslatedText(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.accent700)),
           const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 14, color: AppColors.neutral800)),
+          TranslatedText(value, style: const TextStyle(fontSize: 14, color: AppColors.neutral800)),
         ],
       ),
     );

@@ -6,6 +6,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../core/i18n/language_controller.dart';
+import '../../core/i18n/translated_text.dart';
 import '../../core/network/api_exception.dart';
 import '../../core/network/api_service.dart';
 import '../../core/providers/core_providers.dart';
@@ -68,14 +69,14 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
     if (_downloadingPdf) return;
     if (!s.done) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please wait — the report is still being generated.')),
+        const SnackBar(content: TranslatedText('Please wait — the report is still being generated.')),
       );
       return;
     }
     setState(() => _downloadingPdf = true);
     final messenger = ScaffoldMessenger.of(context)
       ..showSnackBar(const SnackBar(
-        content: Text('Generating PDF…'),
+        content: TranslatedText('Generating PDF…'),
         duration: Duration(minutes: 1),
       ));
     try {
@@ -94,17 +95,17 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
       messenger.hideCurrentSnackBar();
       final res = await OpenFilex.open(file.path);
       if (res.type != ResultType.done && mounted) {
-        messenger.showSnackBar(SnackBar(content: Text('Saved to ${file.path}')));
+        messenger.showSnackBar(SnackBar(content: TranslatedText('Saved to ${file.path}')));
       }
     } on ApiException catch (e) {
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
-        SnackBar(content: Text(e.message), backgroundColor: AppColors.destructive),
+        SnackBar(content: TranslatedText(e.message), backgroundColor: AppColors.destructive),
       );
     } catch (_) {
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
-        const SnackBar(content: Text('Could not generate the PDF.'), backgroundColor: AppColors.destructive),
+        const SnackBar(content: TranslatedText('Could not generate the PDF.'), backgroundColor: AppColors.destructive),
       );
     } finally {
       if (mounted) setState(() => _downloadingPdf = false);
@@ -154,7 +155,7 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(title,
+            child: TranslatedText(title,
                 style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w800)),
           ),
           IconButton(
@@ -190,7 +191,7 @@ class _ProgressBanner extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text('Generating your report... ($loaded/$total sections)',
+            child: TranslatedText('Generating your report... ($loaded/$total sections)',
                 style: const TextStyle(fontSize: 13, color: AppColors.primary700, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -228,7 +229,7 @@ class _SectionNav extends StatelessWidget {
                 children: [
                   Icon(icon, size: 16, color: sel ? AppColors.white : AppColors.neutral600),
                   const SizedBox(width: 6),
-                  Text(label,
+                  TranslatedText(label,
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -288,9 +289,9 @@ class _SectionContent extends StatelessWidget {
               if (!state.done) ...[
                 const CircularProgressIndicator(color: AppColors.primary600),
                 const SizedBox(height: AppSpacing.s2),
-                const Text('Generating this section...', style: TextStyle(color: AppColors.neutral500)),
+                const TranslatedText('Generating this section...', style: TextStyle(color: AppColors.neutral500)),
               ] else
-                const Text('No data available for this section.',
+                const TranslatedText('No data available for this section.',
                     style: TextStyle(color: AppColors.neutral500)),
             ],
           ),

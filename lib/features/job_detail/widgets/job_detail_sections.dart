@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
@@ -30,7 +31,7 @@ class SectionTitle extends StatelessWidget {
               child: Icon(icon, color: AppColors.primary700, size: 20),
             ),
             const SizedBox(width: AppSpacing.s2),
-            Expanded(child: Text(title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20))),
+            Expanded(child: TranslatedText(title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20))),
           ],
         ),
       );
@@ -49,7 +50,7 @@ class _Bullet extends StatelessWidget {
           children: [
             Icon(icon, size: 18, color: color),
             const SizedBox(width: 10),
-            Expanded(child: Text(text, style: const TextStyle(height: 1.45, color: AppColors.neutral700))),
+            Expanded(child: TranslatedText(text, style: const TextStyle(height: 1.45, color: AppColors.neutral700))),
           ],
         ),
       );
@@ -65,7 +66,7 @@ class _LinkButton extends StatelessWidget {
     return TextButton.icon(
       onPressed: () => _openUrl(url),
       icon: const Icon(Icons.open_in_new_rounded, size: 15),
-      label: Text(label),
+      label: TranslatedText(label),
       style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: AppColors.primary600),
     );
   }
@@ -81,14 +82,14 @@ class OverviewSection extends StatelessWidget {
       children: [
         const SectionTitle(Icons.description_outlined, 'Overview'),
         if (o.description.isNotEmpty)
-          AppCard(child: Text(o.description, style: const TextStyle(height: 1.55, color: AppColors.neutral700))),
+          AppCard(child: TranslatedText(o.description, style: const TextStyle(height: 1.55, color: AppColors.neutral700))),
         if (o.keyResponsibilities.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.s2),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Key Responsibilities', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('Key Responsibilities', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s1),
                 for (final r in o.keyResponsibilities) _Bullet(r),
               ],
@@ -101,7 +102,7 @@ class OverviewSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Why This Suits You', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('Why This Suits You', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s1),
                 for (final w in o.whySuitable) _Bullet(w, icon: Icons.star_rounded, color: AppColors.amber600),
               ],
@@ -133,7 +134,7 @@ class PathwaySection extends StatelessWidget {
                   height: 30,
                   decoration: const BoxDecoration(color: AppColors.primary600, shape: BoxShape.circle),
                   alignment: Alignment.center,
-                  child: Text('${i + 1}',
+                  child: TranslatedText('${i + 1}',
                       style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 13)),
                 ),
                 const SizedBox(width: AppSpacing.s2),
@@ -143,7 +144,7 @@ class PathwaySection extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: Text(p.steps[i].phase, style: Theme.of(context).textTheme.titleMedium)),
+                          Expanded(child: TranslatedText(p.steps[i].phase, style: Theme.of(context).textTheme.titleMedium)),
                           if (p.steps[i].duration.isNotEmpty)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -151,14 +152,14 @@ class PathwaySection extends StatelessWidget {
                                 color: AppColors.primary50,
                                 borderRadius: BorderRadius.circular(AppRadius.pill),
                               ),
-                              child: Text(p.steps[i].duration,
+                              child: TranslatedText(p.steps[i].duration,
                                   style: const TextStyle(fontSize: 11, color: AppColors.primary700)),
                             ),
                         ],
                       ),
                       if (p.steps[i].description.isNotEmpty) ...[
                         const SizedBox(height: 4),
-                        Text(p.steps[i].description, style: const TextStyle(color: AppColors.neutral600, height: 1.45)),
+                        TranslatedText(p.steps[i].description, style: const TextStyle(color: AppColors.neutral600, height: 1.45)),
                       ],
                     ],
                   ),
@@ -189,7 +190,7 @@ class InstitutesSection extends StatelessWidget {
         for (final (label, list) in groups) ...[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(label,
+            child: TranslatedText(label,
                 style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.neutral800)),
           ),
           for (final i in list) _InstituteCard(i).paddedBottom(),
@@ -211,10 +212,10 @@ class _InstituteCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text(i.name, style: Theme.of(context).textTheme.titleMedium)),
+              Expanded(child: TranslatedText(i.name, style: Theme.of(context).textTheme.titleMedium)),
               const Icon(Icons.star_rounded, size: 16, color: AppColors.amber600),
               const SizedBox(width: 2),
-              Text(i.rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.w600)),
+              TranslatedText(i.rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           ),
           if (i.location.isNotEmpty)
@@ -223,18 +224,18 @@ class _InstituteCard extends StatelessWidget {
               child: Row(children: [
                 const Icon(Icons.location_on_outlined, size: 14, color: AppColors.neutral500),
                 const SizedBox(width: 4),
-                Expanded(child: Text(i.location, style: const TextStyle(fontSize: 13, color: AppColors.neutral600))),
+                Expanded(child: TranslatedText(i.location, style: const TextStyle(fontSize: 13, color: AppColors.neutral600))),
               ]),
             ),
           if (i.department.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text(i.department, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
+              child: TranslatedText(i.department, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
             ),
           if (i.eligibility.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text('Eligibility: ${i.eligibility}',
+              child: TranslatedText('Eligibility: ${i.eligibility}',
                   style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
             ),
           _LinkButton('Visit website', i.website),
@@ -264,13 +265,13 @@ class FeesSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Total Investment', style: TextStyle(fontSize: 13, color: AppColors.neutral600)),
+              const TranslatedText('Total Investment', style: TextStyle(fontSize: 13, color: AppColors.neutral600)),
               const SizedBox(height: 4),
-              Text(f.totalRange.isEmpty ? '—' : f.totalRange,
+              TranslatedText(f.totalRange.isEmpty ? '—' : f.totalRange,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppColors.primary700)),
               if (f.description.isNotEmpty) ...[
                 const SizedBox(height: 6),
-                Text(f.description, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
+                TranslatedText(f.description, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
               ],
             ],
           ),
@@ -285,13 +286,13 @@ class FeesSection extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(b.phase, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      TranslatedText(b.phase, style: const TextStyle(fontWeight: FontWeight.w600)),
                       if (b.details.isNotEmpty)
-                        Text(b.details, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
+                        TranslatedText(b.details, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
                     ],
                   ),
                 ),
-                Text(b.cost, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary600)),
+                TranslatedText(b.cost, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary600)),
               ],
             ),
           ).paddedBottom(),
@@ -330,7 +331,7 @@ class ScholarshipsSection extends StatelessWidget {
 
   Widget _groupLabel(String t) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Text(t, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.neutral800)),
+        child: TranslatedText(t, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.neutral800)),
       );
 }
 
@@ -344,16 +345,16 @@ class _AidCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          TranslatedText(title, style: Theme.of(context).textTheme.titleMedium),
           if (value.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text(value, style: const TextStyle(color: AppColors.primary600, fontWeight: FontWeight.w600)),
+              child: TranslatedText(value, style: const TextStyle(color: AppColors.primary600, fontWeight: FontWeight.w600)),
             ),
           if (sub.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text(sub, style: const TextStyle(fontSize: 12, color: AppColors.neutral600)),
+              child: TranslatedText(sub, style: const TextStyle(fontSize: 12, color: AppColors.neutral600)),
             ),
           _LinkButton('Learn more', url),
         ],
@@ -384,7 +385,7 @@ class JobMarketSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Hiring Trends', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('Hiring Trends', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s2),
                 SizedBox(height: 180, child: _HiringTrendChart(m.hiringTrends)),
               ],
@@ -397,16 +398,16 @@ class JobMarketSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Top Hiring Companies', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('Top Hiring Companies', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s1),
                 for (final co in m.topCompanies)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Row(
                       children: [
-                        Expanded(child: Text(co.name, style: const TextStyle(fontWeight: FontWeight.w600))),
+                        Expanded(child: TranslatedText(co.name, style: const TextStyle(fontWeight: FontWeight.w600))),
                         if (co.packageRange.isNotEmpty)
-                          Text(co.packageRange, style: const TextStyle(fontSize: 13, color: AppColors.primary600)),
+                          TranslatedText(co.packageRange, style: const TextStyle(fontSize: 13, color: AppColors.primary600)),
                       ],
                     ),
                   ),
@@ -420,7 +421,7 @@ class JobMarketSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Key Insights', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('Key Insights', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s1),
                 for (final k in m.keyInsights) _Bullet(k, icon: Icons.insights_rounded),
               ],
@@ -441,8 +442,8 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.s2),
         child: Column(
           children: [
-            Text(value, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: color)),
-            Text(label, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
+            TranslatedText(value, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: color)),
+            TranslatedText(label, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
           ],
         ),
       );
@@ -475,7 +476,7 @@ class _HiringTrendChart extends StatelessWidget {
                 final label = trends[i].month;
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: Text(label.length > 3 ? label.substring(0, 3) : label,
+                  child: TranslatedText(label.length > 3 ? label.substring(0, 3) : label,
                       style: const TextStyle(fontSize: 10, color: AppColors.neutral500)),
                 );
               },
@@ -512,9 +513,9 @@ class CertificationsSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(c.name, style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText(c.name, style: Theme.of(context).textTheme.titleMedium),
                 if (c.provider.isNotEmpty)
-                  Text(c.provider, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
+                  TranslatedText(c.provider, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
                 const SizedBox(height: 6),
                 Wrap(spacing: 8, runSpacing: 6, children: [
                   if (c.duration.isNotEmpty) _Tag(Icons.schedule_rounded, c.duration),
@@ -541,7 +542,7 @@ class _Tag extends StatelessWidget {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(icon, size: 13, color: AppColors.neutral600),
           const SizedBox(width: 4),
-          Text(text, style: const TextStyle(fontSize: 12, color: AppColors.neutral700)),
+          TranslatedText(text, style: const TextStyle(fontSize: 12, color: AppColors.neutral700)),
         ]),
       );
 }
@@ -564,12 +565,12 @@ class SalarySection extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(p.role, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      Text(p.experience, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
+                      TranslatedText(p.role, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      TranslatedText(p.experience, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
                     ],
                   ),
                 ),
-                Text(p.salary, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.accent600)),
+                TranslatedText(p.salary, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.accent600)),
               ],
             ),
           ).paddedBottom(),
@@ -579,7 +580,7 @@ class SalarySection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('City Comparison', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('City Comparison', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s2),
                 SizedBox(height: 200, child: _CityChart(s.cityComparison)),
               ],
@@ -592,7 +593,7 @@ class SalarySection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Salary Tips', style: Theme.of(context).textTheme.titleMedium),
+                TranslatedText('Salary Tips', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s1),
                 for (final t in s.salaryTips) _Bullet(t, icon: Icons.lightbulb_outline_rounded, color: AppColors.amber600),
               ],
@@ -635,7 +636,7 @@ class _CityChart extends StatelessWidget {
                 if (i < 0 || i >= cities.length) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: Text(cities[i].city,
+                  child: TranslatedText(cities[i].city,
                       style: const TextStyle(fontSize: 10, color: AppColors.neutral500)),
                 );
               },
@@ -681,7 +682,7 @@ class ExpertsSection extends StatelessWidget {
                     CircleAvatar(
                       radius: 22,
                       backgroundColor: AppColors.primary100,
-                      child: Text(
+                      child: TranslatedText(
                         e.name.isNotEmpty ? e.name[0].toUpperCase() : '?',
                         style: const TextStyle(color: AppColors.primary700, fontWeight: FontWeight.w700),
                       ),
@@ -691,11 +692,11 @@ class ExpertsSection extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(e.name, style: Theme.of(context).textTheme.titleMedium),
-                          Text([e.designation, e.company].where((s) => s.isNotEmpty).join(' · '),
+                          TranslatedText(e.name, style: Theme.of(context).textTheme.titleMedium),
+                          TranslatedText([e.designation, e.company].where((s) => s.isNotEmpty).join(' · '),
                               style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
                           if (e.experience.isNotEmpty)
-                            Text(e.experience, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
+                            TranslatedText(e.experience, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
                         ],
                       ),
                     ),
@@ -709,7 +710,7 @@ class ExpertsSection extends StatelessWidget {
                       color: AppColors.primary50,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
-                    child: Text('“${e.advice}”',
+                    child: TranslatedText('“${e.advice}”',
                         style: const TextStyle(fontStyle: FontStyle.italic, color: AppColors.neutral700, height: 1.45)),
                   ),
                 ],
@@ -743,7 +744,7 @@ class SkillsSection extends StatelessWidget {
               children: [
                 Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
                 const SizedBox(width: 8),
-                Text(label, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.neutral800)),
+                TranslatedText(label, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.neutral800)),
               ],
             ),
           ),
@@ -765,11 +766,11 @@ class _SkillCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(s.name, style: Theme.of(context).textTheme.titleMedium),
+          TranslatedText(s.name, style: Theme.of(context).textTheme.titleMedium),
           if (s.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(s.description, style: const TextStyle(fontSize: 13, color: AppColors.neutral600, height: 1.4)),
+              child: TranslatedText(s.description, style: const TextStyle(fontSize: 13, color: AppColors.neutral600, height: 1.4)),
             ),
           Row(
             children: [
@@ -779,7 +780,7 @@ class _SkillCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: () => _openUrl(s.videoUrl),
                   icon: const Icon(Icons.play_circle_outline_rounded, size: 16),
-                  label: const Text('Video'),
+                  label: const TranslatedText('Video'),
                   style: TextButton.styleFrom(padding: EdgeInsets.zero, foregroundColor: AppColors.destructive),
                 ),
               ],
@@ -817,11 +818,11 @@ class RoadmapSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (r.totalDuration.isNotEmpty)
-                  Text(r.totalDuration,
+                  TranslatedText(r.totalDuration,
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primary700)),
                 if (r.overview.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Text(r.overview, style: const TextStyle(fontSize: 13, color: AppColors.neutral600, height: 1.4)),
+                  TranslatedText(r.overview, style: const TextStyle(fontSize: 13, color: AppColors.neutral600, height: 1.4)),
                 ],
               ],
             ),
@@ -851,11 +852,11 @@ class _PhaseCard extends StatelessWidget {
                 height: 30,
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                 alignment: Alignment.center,
-                child: Text('${index + 1}',
+                child: TranslatedText('${index + 1}',
                     style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 13)),
               ),
               const SizedBox(width: AppSpacing.s2),
-              Expanded(child: Text(phase.title, style: Theme.of(context).textTheme.titleMedium)),
+              Expanded(child: TranslatedText(phase.title, style: Theme.of(context).textTheme.titleMedium)),
             ],
           ),
           if (phase.goals.isNotEmpty) _PhaseGroup('Goals', phase.goals, Icons.flag_outlined, color),
@@ -881,7 +882,7 @@ class _PhaseGroup extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.neutral500)),
+          TranslatedText(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.neutral500)),
           const SizedBox(height: 6),
           for (final item in items)
             Padding(
@@ -891,7 +892,7 @@ class _PhaseGroup extends StatelessWidget {
                 children: [
                   Icon(icon, size: 16, color: color),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(item, style: const TextStyle(height: 1.4, color: AppColors.neutral700))),
+                  Expanded(child: TranslatedText(item, style: const TextStyle(height: 1.4, color: AppColors.neutral700))),
                 ],
               ),
             ),

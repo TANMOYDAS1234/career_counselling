@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/gradient_button.dart';
@@ -379,9 +380,9 @@ class _SlidingTileState extends State<SlidingTile> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(_isWarmup ? 'Warmup Round' : 'Puzzle — Level ${_config.tier - 1}',
+        TranslatedText(_isWarmup ? 'Warmup Round' : 'Puzzle — Level ${_config.tier - 1}',
             style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
-        Text(_isWarmup ? 'Get familiar with the controls' : 'Arrange tiles 1–8 in order',
+        TranslatedText(_isWarmup ? 'Get familiar with the controls' : 'Arrange tiles 1–8 in order',
             style: const TextStyle(fontSize: 13, color: AppColors.neutral500)),
         const SizedBox(height: AppSpacing.s3),
         Center(
@@ -407,7 +408,7 @@ class _SlidingTileState extends State<SlidingTile> {
                 child: OutlinedButton.icon(
                   onPressed: _moveCount >= _config.solution.length ? null : _handleHint,
                   icon: const Icon(Icons.lightbulb_outline_rounded, size: 18, color: AppColors.amber600),
-                  label: Text('Hint ($_hintsUsed used)', style: const TextStyle(color: AppColors.amber600)),
+                  label: TranslatedText('Hint ($_hintsUsed used)', style: const TextStyle(color: AppColors.amber600)),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(46),
                     side: const BorderSide(color: AppColors.amber600),
@@ -420,7 +421,7 @@ class _SlidingTileState extends State<SlidingTile> {
                   child: OutlinedButton(
                     onPressed: _handleQuit,
                     style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                    child: const Text("I'm done with this", style: TextStyle(color: AppColors.neutral500)),
+                    child: const TranslatedText("I'm done with this", style: TextStyle(color: AppColors.neutral500)),
                   ),
                 ),
               ],
@@ -435,7 +436,7 @@ class _SlidingTileState extends State<SlidingTile> {
               borderRadius: BorderRadius.circular(AppRadius.sm),
               border: Border.all(color: AppColors.accent200),
             ),
-            child: Text('Solved in $_moveCount moves ✓',
+            child: TranslatedText('Solved in $_moveCount moves ✓',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: AppColors.accent700, fontWeight: FontWeight.w700)),
           ),
@@ -466,7 +467,7 @@ class _SlidingTileState extends State<SlidingTile> {
           ),
         ),
         alignment: Alignment.center,
-        child: Text(empty ? '' : '$val',
+        child: TranslatedText(empty ? '' : '$val',
             style: GoogleFonts.poppins(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
@@ -489,14 +490,14 @@ class _IntroCard extends StatelessWidget {
           height: 64,
           decoration: BoxDecoration(gradient: AppGradientsTeal.teal, borderRadius: BorderRadius.circular(AppRadius.md)),
           alignment: Alignment.center,
-          child: const Text('🧩', style: TextStyle(fontSize: 30)),
+          child: const TranslatedText('🧩', style: TextStyle(fontSize: 30)),
         ),
         const SizedBox(height: AppSpacing.s3),
-        Text('One last game — this one is a bit different.',
+        TranslatedText('One last game — this one is a bit different.',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
         const SizedBox(height: AppSpacing.s2),
-        const Text('No time limit. No streak. Just a puzzle.\nSee how far you get.',
+        const TranslatedText('No time limit. No streak. Just a puzzle.\nSee how far you get.',
             textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: AppColors.neutral600, height: 1.5)),
         const SizedBox(height: AppSpacing.s3),
         Container(
@@ -506,7 +507,7 @@ class _IntroCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.sm),
             border: Border.all(color: AppColors.accent200),
           ),
-          child: const Text(
+          child: const TranslatedText(
             'Slide the numbered tiles into order (1–8). Tap a tile next to the empty space to move it. A hint button is available if you get stuck.',
             style: TextStyle(fontSize: 13, color: AppColors.accent700),
           ),
@@ -518,7 +519,7 @@ class _IntroCard extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onSkip,
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                child: const Text('Skip this game', style: TextStyle(color: AppColors.neutral500)),
+                child: const TranslatedText('Skip this game', style: TextStyle(color: AppColors.neutral500)),
               ),
             ),
             const SizedBox(width: AppSpacing.s1),
@@ -545,11 +546,11 @@ class _TierCompleteCard extends StatelessWidget {
           child: const Icon(Icons.check_circle_outline_rounded, color: AppColors.white, size: 34),
         ),
         const SizedBox(height: AppSpacing.s2),
-        Text('Nice — you unlocked the next level.',
+        TranslatedText('Nice — you unlocked the next level.',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontSize: 19, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
         const SizedBox(height: AppSpacing.s1),
-        const Text('This one is harder. Same rules — no time limit, no pressure.',
+        const TranslatedText('This one is harder. Same rules — no time limit, no pressure.',
             textAlign: TextAlign.center, style: TextStyle(color: AppColors.neutral600)),
         const SizedBox(height: AppSpacing.s3),
         Row(
@@ -558,7 +559,7 @@ class _TierCompleteCard extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onDone,
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                child: const Text("I'm done"),
+                child: const TranslatedText("I'm done"),
               ),
             ),
             const SizedBox(width: AppSpacing.s1),

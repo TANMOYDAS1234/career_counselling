@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
@@ -67,7 +68,8 @@ class _QuestionHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(question.prompt, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
+              TranslatedText(question.prompt,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
               const SizedBox(height: 4),
               Text(_subtitle(question), style: const TextStyle(fontSize: 13, color: AppColors.neutral500)),
             ],
@@ -235,13 +237,9 @@ class _SubjectGrid extends ConsumerWidget {
 
     return Column(
       children: [
-        GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: AppSpacing.s1,
-          crossAxisSpacing: AppSpacing.s1,
-          childAspectRatio: 1.9,
+        Wrap(
+          spacing: AppSpacing.s1,
+          runSpacing: AppSpacing.s1,
           children: [
             for (final subject in kSubjects)
               ChoiceChipCard(
@@ -293,8 +291,8 @@ class _MarksGrid extends ConsumerWidget {
             runSpacing: AppSpacing.s1,
             children: [
               for (final (value, label) in kMarkBands)
-                SizedBox(
-                  width: 92,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 92),
                   child: ChoiceChipCard(
                     label: label,
                     color: AppColors.emerald600,

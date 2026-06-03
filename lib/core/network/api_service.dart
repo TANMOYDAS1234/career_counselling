@@ -165,6 +165,29 @@ class ApiService {
     return texts;
   }
 
+  // ── Payment (Razorpay) ────────────────────────────────────────────────────
+  /// Creates a Razorpay order server-side. Returns `{orderId, keyId, amount,
+  /// currency}` on success, or null on failure. [amount] is in paise.
+  Future<Map<String, dynamic>?> createRazorpayOrder({int amount = 58900}) async {
+    final res = await _post('/api/create-razorpay-order', {'amount': amount});
+    if (res['success'] == true && res['orderId'] != null) return res;
+    return null;
+  }
+
+  /// Verifies the Razorpay payment signature server-side. Returns true if valid.
+  Future<bool> verifyPayment({
+    required String orderId,
+    required String paymentId,
+    required String signature,
+  }) async {
+    final res = await _post('/api/verify-payment', {
+      'razorpay_order_id': orderId,
+      'razorpay_payment_id': paymentId,
+      'razorpay_signature': signature,
+    });
+    return res['success'] == true;
+  }
+
   // ── PDF ─────────────────────────────────────────────────────────────────
   /// Generates the career-report PDF on the backend (Playwright) and returns
   /// the raw bytes. [detailData] is the normalized job-detail map

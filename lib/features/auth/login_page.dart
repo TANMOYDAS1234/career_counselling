@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/i18n/translated_text.dart';
 import '../../core/providers/core_providers.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
@@ -94,10 +95,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: Wrap(
           alignment: WrapAlignment.center,
           children: [
-            const Text("Don't have an account? ", style: TextStyle(color: AppColors.neutral600)),
+            const TranslatedText("Don't have an account? ", style: TextStyle(color: AppColors.neutral600)),
             GestureDetector(
               onTap: () => context.go(Routes.signup),
-              child: const Text('Sign Up',
+              child: const TranslatedText('Sign Up',
                   style: TextStyle(color: AppColors.primary700, fontWeight: FontWeight.w600)),
             ),
           ],

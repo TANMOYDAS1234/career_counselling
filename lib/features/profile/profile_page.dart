@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/i18n/translated_text.dart';
 import '../../core/network/api_exception.dart';
 import '../../core/network/api_service.dart';
 import '../../core/providers/core_providers.dart';
@@ -71,7 +72,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _toast(String msg, {bool error = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: error ? AppColors.destructive : null),
+      SnackBar(content: TranslatedText(msg), backgroundColor: error ? AppColors.destructive : null),
     );
   }
 
@@ -197,7 +198,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Profile',
+                    TranslatedText('Profile',
                         style: GoogleFonts.poppins(
                             fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
                     const SizedBox(height: AppSpacing.s2),
@@ -229,7 +230,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Change password',
+                    TranslatedText('Change password',
                         style: GoogleFonts.poppins(
                             fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
                     const SizedBox(height: AppSpacing.s2),
@@ -257,7 +258,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   if (context.mounted) context.go(Routes.landing);
                 },
                 icon: const Icon(Icons.logout_rounded, color: AppColors.destructive),
-                label: const Text('Log out', style: TextStyle(color: AppColors.destructive)),
+                label: const TranslatedText('Log out', style: TextStyle(color: AppColors.destructive)),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
                   side: const BorderSide(color: AppColors.destructiveBorder),
@@ -307,7 +308,7 @@ class _Avatar extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: bytes != null
               ? Image.memory(bytes, width: 96, height: 96, fit: BoxFit.cover)
-              : Text(_initials(fallback),
+              : TranslatedText(_initials(fallback),
                   style: GoogleFonts.poppins(
                       fontSize: 34, fontWeight: FontWeight.w700, color: AppColors.white)),
         ),
@@ -361,14 +362,14 @@ class _LastRoleCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Last viewed role',
+                const TranslatedText('Last viewed role',
                     style: TextStyle(fontSize: 12, color: AppColors.neutral500)),
-                Text(title,
+                TranslatedText(title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
                 if (sections != null)
-                  Text('$sections/11 sections generated',
+                  TranslatedText('$sections/11 sections generated',
                       style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
               ],
             ),

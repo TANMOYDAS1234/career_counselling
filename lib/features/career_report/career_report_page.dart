@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/i18n/translated_text.dart';
 import '../../core/network/api_exception.dart';
 import '../../core/network/api_service.dart';
 import '../../core/providers/core_providers.dart';
@@ -68,7 +69,7 @@ class _ReportLoading extends StatelessWidget {
         children: [
           CircularProgressIndicator(color: AppColors.primary600),
           SizedBox(height: AppSpacing.s2),
-          Text('Loading your mindset report…', style: TextStyle(color: AppColors.neutral600)),
+          TranslatedText('Loading your mindset report…', style: TextStyle(color: AppColors.neutral600)),
         ],
       ),
     );
@@ -91,21 +92,21 @@ class _ReportError extends StatelessWidget {
           children: [
             const Icon(Icons.insights_rounded, size: 56, color: AppColors.primary400),
             const SizedBox(height: AppSpacing.s2),
-            Text('Report Not Available',
+            TranslatedText('Report Not Available',
                 style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
             const SizedBox(height: AppSpacing.s1),
-            Text(message,
+            TranslatedText(message,
                 style: const TextStyle(color: AppColors.neutral500), textAlign: TextAlign.center),
             const SizedBox(height: AppSpacing.s3),
             if (onRetry != null)
-              OutlinedButton(onPressed: onRetry, child: const Text('Retry'))
+              OutlinedButton(onPressed: onRetry, child: const TranslatedText('Retry'))
             else
               OutlinedButton(
                 onPressed: () {
                   final c = GoRouter.of(context);
                   c.canPop() ? c.pop() : c.go(Routes.recommendations);
                 },
-                child: const Text('Back'),
+                child: const TranslatedText('Back'),
               ),
           ],
         ),
@@ -185,7 +186,7 @@ class _ReportBody extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s2),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Marks in favourite subjects',
+                      child: TranslatedText('Marks in favourite subjects',
                           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
                     ),
                     const SizedBox(height: AppSpacing.s1),
@@ -201,7 +202,7 @@ class _ReportBody extends StatelessWidget {
                               borderRadius: BorderRadius.circular(AppRadius.sm),
                               border: Border.all(color: AppColors.emerald100),
                             ),
-                            child: Text('$sub: ${subjectMarks[sub] ?? '—'}',
+                            child: TranslatedText('$sub: ${subjectMarks[sub] ?? '—'}',
                                 style: const TextStyle(
                                     fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.emerald600)),
                           ),
@@ -285,7 +286,7 @@ class _ReportBody extends StatelessWidget {
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.error_outline_rounded, size: 16, color: AppColors.destructive),
                         SizedBox(width: 4),
-                        Text('Counselor Flags',
+                        TranslatedText('Counselor Flags',
                             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.destructive)),
                       ]),
                     ),
@@ -303,7 +304,7 @@ class _ReportBody extends StatelessWidget {
                           const Icon(Icons.error_outline_rounded, size: 16, color: AppColors.destructive),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(flag, style: const TextStyle(fontSize: 12, color: Color(0xFFB91C1C))),
+                            child: TranslatedText(flag, style: const TextStyle(fontSize: 12, color: Color(0xFFB91C1C))),
                           ),
                         ]),
                       ),
@@ -322,7 +323,7 @@ class _ReportBody extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: AppSpacing.s2,
                   crossAxisSpacing: AppSpacing.s2,
-                  childAspectRatio: 1.5,
+                  childAspectRatio: 1.3,
                   children: [
                     _AptitudeTile(label: 'Quantitative', score: _asInt(aptitude['numberSense'])),
                     _AptitudeTile(label: 'Verbal', score: _asInt(aptitude['wordSense'])),
@@ -392,10 +393,10 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Mindset Analysis Report',
+                TranslatedText('Mindset Analysis Report',
                     style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
                 if (name.isNotEmpty)
-                  Text(name, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
+                  TranslatedText(name, style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
               ],
             ),
           ),
@@ -437,7 +438,7 @@ class _Section extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.s2),
               Expanded(
-                child: Text(title,
+                child: TranslatedText(title,
                     style: GoogleFonts.poppins(
                         fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
               ),
@@ -469,10 +470,10 @@ class _Row extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
+          TranslatedText(label,
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
           const SizedBox(height: 2),
-          Text(shown, style: const TextStyle(fontSize: 14, color: AppColors.neutral800)),
+          TranslatedText(shown, style: const TextStyle(fontSize: 14, color: AppColors.neutral800)),
         ],
       ),
     );
@@ -488,40 +489,43 @@ class _AptitudeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.s2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.neutral50,
         borderRadius: BorderRadius.circular(AppRadius.sm),
         border: Border.all(color: AppColors.neutral200),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
-          const SizedBox(height: 4),
-          RichText(
-            text: TextSpan(
-              text: score?.toString() ?? '—',
-              style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.neutral900),
-              children: const [
-                TextSpan(text: '/8', style: TextStyle(fontSize: 13, color: AppColors.neutral400)),
-              ],
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TranslatedText(label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
+            const SizedBox(height: 4),
+            RichText(
+              text: TextSpan(
+                text: score?.toString() ?? '—',
+                style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.neutral900),
+                children: const [
+                  TextSpan(text: '/8', style: TextStyle(fontSize: 13, color: AppColors.neutral400)),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: ReportLabels.aptitudeBg(score),
-              borderRadius: BorderRadius.circular(AppRadius.pill),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: ReportLabels.aptitudeBg(score),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: TranslatedText(ReportLabels.aptitudeLabel(score),
+                  style: TextStyle(
+                      fontSize: 11, fontWeight: FontWeight.w600, color: ReportLabels.aptitudeFg(score))),
             ),
-            child: Text(ReportLabels.aptitudeLabel(score),
-                style: TextStyle(
-                    fontSize: 11, fontWeight: FontWeight.w600, color: ReportLabels.aptitudeFg(score))),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -547,18 +551,18 @@ class _TopCareerCard extends StatelessWidget {
           Row(children: [
             const Icon(Icons.trending_up_rounded, color: AppColors.white, size: 24),
             const SizedBox(width: AppSpacing.s1),
-            Text('Top Career Match',
+            TranslatedText('Top Career Match',
                 style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.white)),
             const Spacer(),
             if (match != null)
-              Text('$match%',
+              TranslatedText('$match%',
                   style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.white)),
           ]),
           const SizedBox(height: AppSpacing.s2),
-          Text((career['title'] ?? '') as String,
+          TranslatedText((career['title'] ?? '') as String,
               style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.white)),
           const SizedBox(height: AppSpacing.s1),
-          Text((career['description'] ?? career['summary'] ?? '') as String,
+          TranslatedText((career['description'] ?? career['summary'] ?? '') as String,
               style: const TextStyle(color: AppColors.primary100, height: 1.4)),
           const SizedBox(height: AppSpacing.s3),
           ElevatedButton.icon(
@@ -569,7 +573,7 @@ class _TopCareerCard extends StatelessWidget {
               elevation: 0,
             ),
             icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
-            label: const Text('View All Recommendations'),
+            label: const TranslatedText('View All Recommendations'),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 
@@ -63,7 +64,7 @@ class OptionCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.s2),
                 Expanded(
-                  child: Text(
+                  child: TranslatedText(
                     label,
                     style: TextStyle(
                       fontSize: 15,
@@ -120,17 +121,16 @@ class ChoiceChipCard extends StatelessWidget {
               ),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Flexible(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                      color: selected ? color : AppColors.neutral700,
-                    ),
+                TranslatedText(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: selected ? color : AppColors.neutral700,
                   ),
                 ),
                 if (selected) ...[

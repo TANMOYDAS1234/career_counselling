@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -41,16 +42,16 @@ class WizardHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
+                    TranslatedText(title,
                         style: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary700)),
                     if (subtitle != null)
-                      Text(subtitle!,
+                      TranslatedText(subtitle!,
                           style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
                   ],
                 ),
               ),
-              Text('${(progress * 100).round()}%',
+              TranslatedText('${(progress * 100).round()}%',
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary600)),
             ],

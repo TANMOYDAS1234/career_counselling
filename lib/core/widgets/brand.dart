@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../i18n/translated_text.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_gradients.dart';
 import '../theme/app_spacing.dart';
@@ -68,7 +69,7 @@ class GradientPill extends StatelessWidget {
           Icon(icon, size: 16, color: AppColors.primary700),
           const SizedBox(width: 6),
           Flexible(
-            child: Text(
+            child: TranslatedText(
               text,
               style: GoogleFonts.inter(
                 fontSize: 13,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/i18n/translated_text.dart';
 import '../../core/providers/core_providers.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
@@ -49,11 +50,11 @@ class _Content extends ConsumerWidget {
         const SizedBox(height: AppSpacing.s1),
         const Center(child: GradientPill(text: 'Your Top Career Matches')),
         const SizedBox(height: AppSpacing.s2),
-        Text('Your Top 3 Career\nRecommendations',
+        TranslatedText('Your Top 3 Career\nRecommendations',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 30)),
         const SizedBox(height: AppSpacing.s1),
-        const Text('Based on your profile, interests, and assessment results',
+        const TranslatedText('Based on your profile, interests, and assessment results',
             textAlign: TextAlign.center, style: TextStyle(color: AppColors.neutral600)),
         const SizedBox(height: AppSpacing.s4),
         if (careers.isEmpty)
@@ -108,9 +109,9 @@ class _CareerCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s2),
-          Text(career.title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 19)),
+          TranslatedText(career.title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 19)),
           const SizedBox(height: 8),
-          Text(career.description,
+          TranslatedText(career.description,
               style: const TextStyle(color: AppColors.neutral600, height: 1.5, fontSize: 14)),
           const SizedBox(height: AppSpacing.s3),
           GradientButton(
@@ -131,10 +132,10 @@ class _RetakeCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.s3),
       child: Column(
         children: [
-          Text('Not satisfied with results?',
+          TranslatedText('Not satisfied with results?',
               textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18)),
           const SizedBox(height: 6),
-          const Text('Retake the assessment with updated information to get better recommendations',
+          const TranslatedText('Retake the assessment with updated information to get better recommendations',
               textAlign: TextAlign.center, style: TextStyle(color: AppColors.neutral600)),
           const SizedBox(height: AppSpacing.s2),
           OutlinedButton.icon(

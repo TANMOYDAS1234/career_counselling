@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
+import '../../core/i18n/translated_text.dart';
+import '../../core/network/api_exception.dart';
+import '../../core/network/api_service.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -8,7 +13,7 @@ import '../../core/widgets/app_background.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/edubot_app_bar.dart';
 import '../../core/widgets/gradient_button.dart';
-import '../auth/widgets/labeled_field.dart';
+import '../auth/auth_controller.dart';
 
 const _included = [
   'Detailed career pathway',
@@ -21,34 +26,114 @@ const _included = [
   'Industry expert advice',
 ];
 
-/// Prototype payment screen (no real processing) — mirrors the web `Payment`.
-class PaymentPage extends StatefulWidget {
+const _amountPaise = 58900; // ₹589.00
+
+/// Payment screen — real Razorpay checkout (test mode). Creates an order on the
+/// backend, opens Razorpay, then verifies the signature server-side before
+/// unlocking the job-detail page.
+class PaymentPage extends ConsumerStatefulWidget {
   const PaymentPage({super.key, required this.jobIndex});
 
   final String jobIndex;
 
   @override
-  State<PaymentPage> createState() => _PaymentPageState();
+  ConsumerState<PaymentPage> createState() => _PaymentPageState();
 }
 
-class _PaymentPageState extends State<PaymentPage> {
-  final _card = TextEditingController();
-  final _name = TextEditingController();
-  final _expiry = TextEditingController();
-  final _cvv = TextEditingController();
+class _PaymentPageState extends ConsumerState<PaymentPage> {
+  late final Razorpay _razorpay;
+  bool _busy = false;
+  String? _currentOrderId;
+
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _onSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _onError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _onExternalWallet);
+  }
 
   @override
   void dispose() {
-    _card.dispose();
-    _name.dispose();
-    _expiry.dispose();
-    _cvv.dispose();
+    _razorpay.clear();
     super.dispose();
   }
 
-  void _pay() {
-    // Prototype only — go straight to the unlocked role detail.
-    context.go('${Routes.role}/job-${widget.jobIndex}');
+  ApiService get _api => ref.read(apiServiceProvider);
+
+  void _toast(String msg, {bool error = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: TranslatedText(msg), backgroundColor: error ? AppColors.destructive : null),
+    );
+  }
+
+  Future<void> _startPayment() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final order = await _api.createRazorpayOrder(amount: _amountPaise);
+      if (order == null) {
+        _toast('Could not start payment. Please try again later.', error: true);
+        setState(() => _busy = false);
+        return;
+      }
+      _currentOrderId = order['orderId'] as String;
+      final email = ref.read(authControllerProvider).user?.email ?? '';
+      _razorpay.open({
+        'key': order['keyId'],
+        'order_id': order['orderId'],
+        'amount': order['amount'],
+        'currency': order['currency'] ?? 'INR',
+        'name': 'EduBot',
+        'description': 'Career Guidance Premium',
+        'prefill': {'email': email},
+        'theme': {'color': '#4F46E5'},
+      });
+      // _busy stays true until a Razorpay callback fires.
+    } on ApiException catch (e) {
+      _toast(e.message, error: true);
+      setState(() => _busy = false);
+    } catch (_) {
+      _toast('Could not start payment.', error: true);
+      setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _onSuccess(PaymentSuccessResponse r) async {
+    // Verify the signature on the server before unlocking.
+    try {
+      final ok = await _api.verifyPayment(
+        orderId: r.orderId ?? _currentOrderId ?? '',
+        paymentId: r.paymentId ?? '',
+        signature: r.signature ?? '',
+      );
+      if (!mounted) return;
+      if (ok) {
+        _toast('Payment successful ✓');
+        context.go('${Routes.role}/job-${widget.jobIndex}');
+      } else {
+        _toast('Payment could not be verified. If money was deducted it will be refunded.', error: true);
+        setState(() => _busy = false);
+      }
+    } catch (_) {
+      if (mounted) {
+        _toast('Could not verify payment.', error: true);
+        setState(() => _busy = false);
+      }
+    }
+  }
+
+  void _onError(PaymentFailureResponse r) {
+    if (!mounted) return;
+    final msg = (r.message != null && r.message!.isNotEmpty) ? r.message! : 'Payment cancelled.';
+    _toast(msg, error: true);
+    setState(() => _busy = false);
+  }
+
+  void _onExternalWallet(ExternalWalletResponse r) {
+    _toast('Selected wallet: ${r.walletName ?? ''}');
   }
 
   @override
@@ -62,75 +147,36 @@ class _PaymentPageState extends State<PaymentPage> {
             TextButton.icon(
               onPressed: () => context.canPop() ? context.pop() : context.go(Routes.recommendations),
               icon: const Icon(Icons.arrow_back_rounded, size: 18),
-              label: const Text('Back'),
+              label: const TranslatedText('Back'),
               style: TextButton.styleFrom(foregroundColor: AppColors.neutral600, alignment: Alignment.centerLeft),
             ),
-            Text('Payment Details', style: Theme.of(context).textTheme.headlineSmall),
+            TranslatedText('Checkout', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 4),
-            const Text('Complete your purchase to unlock career insights',
+            const TranslatedText('Complete your purchase to unlock career insights',
                 style: TextStyle(color: AppColors.neutral600)),
             const SizedBox(height: AppSpacing.s3),
             _OrderSummary(),
             const SizedBox(height: AppSpacing.s2),
-            AppCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LabeledField(
-                    label: 'Card Number',
-                    controller: _card,
-                    hint: '1234 5678 9012 3456',
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: AppSpacing.s2),
-                  LabeledField(label: 'Cardholder Name', controller: _name, hint: 'John Doe'),
-                  const SizedBox(height: AppSpacing.s2),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: LabeledField(
-                          label: 'Expiry',
-                          controller: _expiry,
-                          hint: 'MM/YY',
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.s2),
-                      Expanded(
-                        child: LabeledField(
-                          label: 'CVV',
-                          controller: _cvv,
-                          hint: '123',
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.s2),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.neutral100,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.lock_outline_rounded, size: 16, color: AppColors.neutral600),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text('Your payment information is secure and encrypted',
-                              style: TextStyle(fontSize: 12, color: AppColors.neutral600)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.s3),
-                  GradientButton(label: 'Pay Now', onPressed: _pay),
-                ],
-              ),
+            _IncludedCard(),
+            const SizedBox(height: AppSpacing.s3),
+            GradientButton(
+              label: _busy ? 'Processing…' : 'Pay ₹589 securely',
+              leadingIcon: Icons.lock_outline_rounded,
+              loading: _busy,
+              onPressed: _busy ? null : _startPayment,
             ),
             const SizedBox(height: AppSpacing.s2),
-            _IncludedCard(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.verified_user_outlined, size: 14, color: AppColors.neutral500),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: TranslatedText('Secured by Razorpay · test mode',
+                      style: const TextStyle(fontSize: 12, color: AppColors.neutral500)),
+                ),
+              ],
+            ),
             const SizedBox(height: AppSpacing.s4),
           ],
         ),
@@ -146,9 +192,9 @@ class _OrderSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Career Guidance Premium', style: Theme.of(context).textTheme.titleMedium),
+          TranslatedText('Career Guidance Premium', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
-          const Text('Unlock detailed career insights and roadmaps',
+          const TranslatedText('Unlock detailed career insights and roadmaps',
               style: TextStyle(fontSize: 13, color: AppColors.neutral600)),
           const Divider(height: AppSpacing.s3),
           const _Line('Subtotal', '₹499'),
@@ -158,8 +204,8 @@ class _OrderSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Total', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-              Text('₹589',
+              const TranslatedText('Total', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+              TranslatedText('₹589',
                   style: TextStyle(
                       fontWeight: FontWeight.w800, fontSize: 20, color: AppColors.primary600)),
             ],
@@ -178,8 +224,8 @@ class _Line extends StatelessWidget {
   Widget build(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
-          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          TranslatedText(label, style: const TextStyle(fontSize: 13, color: AppColors.neutral600)),
+          TranslatedText(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       );
 }
@@ -197,7 +243,7 @@ class _IncludedCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("What's Included:", style: Theme.of(context).textTheme.titleMedium),
+          TranslatedText("What's Included:", style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: AppSpacing.s1),
           for (final item in _included)
             Padding(
@@ -206,7 +252,7 @@ class _IncludedCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.check_rounded, size: 16, color: AppColors.primary600),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(item, style: const TextStyle(fontSize: 14, color: AppColors.neutral700))),
+                  Expanded(child: TranslatedText(item, style: const TextStyle(fontSize: 14, color: AppColors.neutral700))),
                 ],
               ),
             ),

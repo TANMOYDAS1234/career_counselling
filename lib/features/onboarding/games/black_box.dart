@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import 'games_models.dart';
@@ -139,9 +140,9 @@ class _BlackBoxState extends State<BlackBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('The Black Box',
+        TranslatedText('The Black Box',
             style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
-        const Text('This box transforms numbers by a hidden rule. Test inputs, figure out the rule, then guess it.',
+        const TranslatedText('This box transforms numbers by a hidden rule. Test inputs, figure out the rule, then guess it.',
             style: TextStyle(fontSize: 13, color: AppColors.neutral500)),
         const SizedBox(height: AppSpacing.s2),
 
@@ -152,7 +153,7 @@ class _BlackBoxState extends State<BlackBox> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('TEST THE BOX',
+              const TranslatedText('TEST THE BOX',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.neutral500, letterSpacing: 0.5)),
               const SizedBox(height: 8),
               Row(
@@ -170,7 +171,7 @@ class _BlackBoxState extends State<BlackBox> {
                   FilledButton(
                     onPressed: _handleTest,
                     style: FilledButton.styleFrom(backgroundColor: _violet600),
-                    child: const Text('Try'),
+                    child: const TranslatedText('Try'),
                   ),
                 ],
               ),
@@ -188,15 +189,15 @@ class _BlackBoxState extends State<BlackBox> {
                               children: [
                                 SizedBox(
                                   width: 60,
-                                  child: Text('${t.input}',
+                                  child: TranslatedText('${t.input}',
                                       textAlign: TextAlign.right,
                                       style: const TextStyle(fontFamily: 'monospace', color: AppColors.neutral600)),
                                 ),
                                 const Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 8),
-                                  child: Text('→', style: TextStyle(color: AppColors.neutral400)),
+                                  child: TranslatedText('→', style: TextStyle(color: AppColors.neutral400)),
                                 ),
-                                Text('${t.output}',
+                                TranslatedText('${t.output}',
                                     style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w700, color: _violet700)),
                               ],
                             ),
@@ -222,17 +223,17 @@ class _BlackBoxState extends State<BlackBox> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('GUESS THE RULE — $remaining guess${remaining == 1 ? '' : 'es'} remaining',
+              TranslatedText('GUESS THE RULE — $remaining guess${remaining == 1 ? '' : 'es'} remaining',
                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _violet700, letterSpacing: 0.5)),
               const SizedBox(height: 6),
-              const Text('output = input × ?  −  ?',
+              const TranslatedText('output = input × ?  −  ?',
                   style: TextStyle(fontSize: 14, color: AppColors.neutral600)),
               const SizedBox(height: 10),
               if (_showLastGuessPrompt)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('You have one guess left. Do you want to use it?',
+                    const TranslatedText('You have one guess left. Do you want to use it?',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.amber600)),
                     const SizedBox(height: 8),
                     Row(
@@ -241,14 +242,14 @@ class _BlackBoxState extends State<BlackBox> {
                           child: FilledButton(
                             onPressed: () => setState(() => _showLastGuessPrompt = false),
                             style: FilledButton.styleFrom(backgroundColor: _violet600),
-                            child: const Text('Make my last guess'),
+                            child: const TranslatedText('Make my last guess'),
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => _finalize(false, true, _guessCount, _wrongGuesses),
-                            child: const Text("I'm done", style: TextStyle(color: AppColors.neutral500)),
+                            child: const TranslatedText("I'm done", style: TextStyle(color: AppColors.neutral500)),
                           ),
                         ),
                       ],
@@ -256,32 +257,31 @@ class _BlackBoxState extends State<BlackBox> {
                   ],
                 )
               else if (!_solved && _guessCount < _bbMaxGuesses)
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    const Text('input ×', style: TextStyle(color: AppColors.neutral500)),
-                    const SizedBox(width: 6),
+                    const TranslatedText('input ×', style: TextStyle(color: AppColors.neutral500)),
                     _miniInput(_guessM),
-                    const SizedBox(width: 6),
-                    const Text('−', style: TextStyle(color: AppColors.neutral500)),
-                    const SizedBox(width: 6),
+                    const TranslatedText('−', style: TextStyle(color: AppColors.neutral500)),
                     _miniInput(_guessS),
-                    const SizedBox(width: 8),
                     FilledButton(
                       onPressed: _handleGuess,
                       style: FilledButton.styleFrom(backgroundColor: _violet600),
-                      child: const Text('Guess'),
+                      child: const TranslatedText('Guess'),
                     ),
                   ],
                 )
               else if (_solved)
-                const Text('✓ Correct! Rule: output = input × 3 − 1',
+                const TranslatedText('✓ Correct! Rule: output = input × 3 − 1',
                     style: TextStyle(color: AppColors.emerald600, fontWeight: FontWeight.w700))
               else
-                const Text('No guesses remaining.',
+                const TranslatedText('No guesses remaining.',
                     style: TextStyle(color: AppColors.destructive, fontWeight: FontWeight.w700)),
               if (_guessError.isNotEmpty) ...[
                 const SizedBox(height: 6),
-                Text(_guessError, style: const TextStyle(fontSize: 13, color: AppColors.destructive)),
+                TranslatedText(_guessError, style: const TextStyle(fontSize: 13, color: AppColors.destructive)),
               ],
             ],
           ),
@@ -293,7 +293,7 @@ class _BlackBoxState extends State<BlackBox> {
               child: OutlinedButton(
                 onPressed: widget.onSkip,
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                child: const Text('Skip', style: TextStyle(color: AppColors.neutral400)),
+                child: const TranslatedText('Skip', style: TextStyle(color: AppColors.neutral400)),
               ),
             ),
             const SizedBox(width: AppSpacing.s1),
@@ -301,7 +301,7 @@ class _BlackBoxState extends State<BlackBox> {
               child: OutlinedButton(
                 onPressed: () => _finalize(false, false, _guessCount, _wrongGuesses),
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                child: const Text("I'm done", style: TextStyle(color: AppColors.neutral500)),
+                child: const TranslatedText("I'm done", style: TextStyle(color: AppColors.neutral500)),
               ),
             ),
           ],

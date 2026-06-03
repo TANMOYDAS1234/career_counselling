@@ -46,6 +46,7 @@ dependencies:
   image_picker: ^1.1.2
   path_provider: ^2.1.5
   open_filex: ^4.5.0
+  razorpay_flutter: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +58,25 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
+
+# App launcher icon (run: dart run flutter_launcher_icons)
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#4F46E5"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  remove_alpha_ios: true
+
+# Branded splash screen (run: dart run flutter_native_splash:create)
+flutter_native_splash:
+  color: "#4F46E5"
+  image: assets/icon/splash.png
+  android_12:
+    color: "#4F46E5"
+    image: assets/icon/splash.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -52,3 +52,7 @@ app.*.map.json
 # Secrets — never commit
 *.env
 .env
+
+# GitHub Actions workflow needs a token with `workflow` scope to push; add it via
+# the GitHub UI instead. (Codemagic's codemagic.yaml is committed and is the main CI.)
+/.github/workflows/build.yml

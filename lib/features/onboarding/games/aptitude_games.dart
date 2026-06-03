@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 
@@ -234,7 +235,7 @@ class _AptitudeGameViewState extends State<AptitudeGameView> {
         Row(
           children: [
             Expanded(
-              child: Text('${gameNames[widget.gameType]} — Question ${widget.round + 1} of 4',
+              child: TranslatedText('${gameNames[widget.gameType]} — Question ${widget.round + 1} of 4',
                   style: GoogleFonts.poppins(
                       fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
             ),
@@ -258,13 +259,13 @@ class _AptitudeGameViewState extends State<AptitudeGameView> {
         if (q.isImage) ...[
           _QuestionImage(path: q.questionImage!, tint: color),
           const SizedBox(height: AppSpacing.s2),
-          Text(q.question,
+          TranslatedText(q.question,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.neutral800)),
           const SizedBox(height: AppSpacing.s2),
           _ImageOptionsGrid(q: q, selected: _selected, color: color, onTap: _answer),
         ] else if (q.words.isNotEmpty) ...[
-          Text(q.question,
+          TranslatedText(q.question,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.neutral800)),
           const SizedBox(height: AppSpacing.s2),
           _WordsGrid(q: q, selected: _selected, color: color, onTap: _answer),
@@ -276,7 +277,7 @@ class _AptitudeGameViewState extends State<AptitudeGameView> {
               color: color.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Text(q.question,
+            child: TranslatedText(q.question,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                     fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
@@ -330,7 +331,7 @@ class _ImageOptionsGrid extends StatelessWidget {
               children: [
                 Expanded(child: Image.asset(q.optionImages[i], fit: BoxFit.contain)),
                 const SizedBox(height: 4),
-                Text(labels[i],
+                TranslatedText(labels[i],
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.neutral800)),
               ],
             ),
@@ -362,7 +363,7 @@ class _WordsGrid extends StatelessWidget {
             color: color,
             onTap: () => onTap(w),
             child: Center(
-              child: Text(w,
+              child: TranslatedText(w,
                   style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.neutral900)),
             ),
           ),
@@ -396,7 +397,7 @@ class _TextOptions extends StatelessWidget {
               color: color,
               onTap: () => onTap(o),
               child: Center(
-                child: Text('$o',
+                child: TranslatedText('$o',
                     style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
               ),
             ),
@@ -414,7 +415,7 @@ class _TextOptions extends StatelessWidget {
               onTap: () => onTap(o),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('$o',
+                child: TranslatedText('$o',
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppColors.neutral900)),
               ),
             ),

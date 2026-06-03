@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../network/api_service.dart';
+import '../providers/core_providers.dart';
 import 'language_controller.dart';
 
 /// In-memory + best-effort batched translation cache for the active language.
@@ -18,10 +19,12 @@ class TranslationController extends Notifier<Map<String, String>> {
 
   @override
   Map<String, String> build() {
-    // Reset the cache whenever the language changes.
-    ref.watch(languageProvider);
+    // Rebuild when the language changes; load that language's persisted cache so
+    // already-translated strings show instantly (and offline) on every launch.
+    final lang = ref.watch(languageProvider);
     ref.onDispose(() => _debounce?.cancel());
-    return const {};
+    if (lang == 'en') return const {};
+    return ref.read(localStorageProvider).getTranslations(lang);
   }
 
   /// Returns the cached translation if present, otherwise schedules a fetch and
@@ -62,6 +65,8 @@ class TranslationController extends Notifier<Map<String, String>> {
         if (i < translations.length) next[batch[i]] = translations[i];
       }
       state = next;
+      // Persist so these translations are instant (and offline) next launch.
+      ref.read(localStorageProvider).setTranslations(lang, next);
     } catch (_) {
       // Leave English in place on failure.
     } finally {

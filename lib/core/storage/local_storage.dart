@@ -41,6 +41,23 @@ class LocalStorage {
   String getLanguage() => _prefs.getString(_kLanguage) ?? 'en';
   Future<void> setLanguage(String code) => _prefs.setString(_kLanguage, code);
 
+  // ── Translation cache (per language, persisted) ───────────────────────────
+  static const _kTrPrefix = 'edubot_tr_';
+
+  Map<String, String> getTranslations(String lang) {
+    final raw = _prefs.getString('$_kTrPrefix$lang');
+    if (raw == null) return {};
+    try {
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      return m.map((k, v) => MapEntry(k, v.toString()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> setTranslations(String lang, Map<String, String> map) =>
+      _prefs.setString('$_kTrPrefix$lang', jsonEncode(map));
+
   // ── Recommendations cache (raw JSON string) ───────────────────────────────
   String? getRecommendationsRaw() => _prefs.getString(_kRecommendations);
   Future<void> setRecommendationsRaw(String json) =>
