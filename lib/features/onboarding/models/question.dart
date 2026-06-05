@@ -44,6 +44,7 @@ class Question {
     required this.headerColor,
     this.options = const [],
     this.optional = false,
+    this.important = false,
     this.maxSelect,
     this.minSelect = 1,
     this.maxLength,
@@ -59,6 +60,10 @@ class Question {
   final Color headerColor;
   final List<QuestionOption> options;
   final bool optional;
+
+  /// Required questions that genuinely drive the result — these cannot be
+  /// skipped (skipping them would prevent a meaningful result).
+  final bool important;
   final int? maxSelect;
   final int minSelect;
   final int? maxLength;

@@ -43,6 +43,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build/
+/android/.gradle/
+
+# Machine-local truststore for building behind TLS inspection (not portable)
+/android/build-cacerts
 
 # The Python backend lives here locally but is version-controlled in its own
 # repo (Career_counselling-_backend) and deployed on Render — keep it out of the

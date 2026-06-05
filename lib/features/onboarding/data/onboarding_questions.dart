@@ -47,7 +47,7 @@ const List<Question> kQuestions = [
     ],
   ),
   Question(
-    number: 2, module: 1, fieldKey: 'fiveYearVision', kind: QuestionKind.single,
+    number: 2, module: 1, fieldKey: 'fiveYearVision', kind: QuestionKind.single, important: true,
     prompt: 'When you imagine yourself five years from now, which feels closest?',
     headerIcon: Icons.auto_awesome, headerColor: AppColors.secondary100,
     options: [
@@ -72,7 +72,7 @@ const List<Question> kQuestions = [
 
   // ── Module 2 — How Your Mind Works ────────────────────────────────────────
   Question(
-    number: 5, module: 2, fieldKey: 'freeSunday', kind: QuestionKind.single,
+    number: 5, module: 2, fieldKey: 'freeSunday', kind: QuestionKind.single, important: true,
     prompt: 'You have a free Sunday. Which sounds most fun?',
     headerIcon: Icons.videogame_asset_outlined, headerColor: AppColors.accent100,
     options: [
@@ -85,7 +85,7 @@ const List<Question> kQuestions = [
     ],
   ),
   Question(
-    number: 6, module: 2, fieldKey: 'groupRole', kind: QuestionKind.single,
+    number: 6, module: 2, fieldKey: 'groupRole', kind: QuestionKind.single, important: true,
     prompt: 'A group project lands in your lap. Without thinking, which role do you grab?',
     headerIcon: Icons.groups_outlined, headerColor: AppColors.primary100,
     options: [
@@ -97,7 +97,7 @@ const List<Question> kQuestions = [
     ],
   ),
   Question(
-    number: 7, module: 2, fieldKey: 'jobBothers', kind: QuestionKind.single,
+    number: 7, module: 2, fieldKey: 'jobBothers', kind: QuestionKind.single, important: true,
     prompt: 'Which of these would bother you most in a future job?',
     headerIcon: Icons.person_off_outlined, headerColor: AppColors.destructiveBg,
     options: [
@@ -111,7 +111,7 @@ const List<Question> kQuestions = [
 
   // ── Module 3 — What You're Good At ────────────────────────────────────────
   Question(
-    number: 8, module: 3, fieldKey: 'favoriteSubjects', kind: QuestionKind.subjectMulti,
+    number: 8, module: 3, fieldKey: 'favoriteSubjects', kind: QuestionKind.subjectMulti, important: true,
     prompt: 'Pick your three favorite subjects this year',
     headerIcon: Icons.menu_book_outlined, headerColor: AppColors.primary100,
     maxSelect: 3, minSelect: 1,
@@ -122,12 +122,12 @@ const List<Question> kQuestions = [
     headerIcon: Icons.trending_up_rounded, headerColor: AppColors.amber100,
   ),
   Question(
-    number: 10, module: 3, fieldKey: 'subjectMarks', kind: QuestionKind.marks,
+    number: 10, module: 3, fieldKey: 'subjectMarks', kind: QuestionKind.marks, important: true,
     prompt: 'Your marks in the subjects you picked as favorites',
     headerIcon: Icons.workspace_premium_outlined, headerColor: AppColors.emerald100,
   ),
   Question(
-    number: 11, module: 3, fieldKey: 'studyExperience', kind: QuestionKind.single,
+    number: 11, module: 3, fieldKey: 'studyExperience', kind: QuestionKind.single, important: true,
     prompt: 'When you study a subject you genuinely enjoy, what happens?',
     headerIcon: Icons.schedule_rounded, headerColor: AppColors.secondary100,
     options: [
@@ -198,7 +198,7 @@ const List<Question> kQuestions = [
     ],
   ),
   Question(
-    number: 17, module: 5, fieldKey: 'careerValues', kind: QuestionKind.multi,
+    number: 17, module: 5, fieldKey: 'careerValues', kind: QuestionKind.multi, important: true,
     prompt: 'When you think about your career, which feels most important?',
     headerIcon: Icons.favorite_outline_rounded, headerColor: AppColors.secondary100,
     maxSelect: 2, minSelect: 2,

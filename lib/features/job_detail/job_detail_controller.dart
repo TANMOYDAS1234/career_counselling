@@ -72,6 +72,7 @@ class JobDetailController extends ChangeNotifier {
 
   late JobDetailState _state;
   JobDetailState get state => _state;
+  int _loaded = 0;
 
   void _set(JobDetailState s) {
     _state = s;
@@ -135,27 +136,20 @@ class JobDetailController extends ChangeNotifier {
   Future<void> _generate() async {
     final qualifiedTitle = _domainQualify(_state.roleTitle);
     final profile = _buildProfile(_state.roleTitle);
-    var loaded = 0;
+    _loaded = 0;
 
-    for (final section in JobDetailParser.sections) {
-      Map? content;
-      for (var attempt = 0; attempt < 2 && content == null; attempt++) {
-        try {
-          content = await api.careerDetails(
-            careerTitle: qualifiedTitle,
-            sectionType: section,
-            profile: profile,
-          );
-        } catch (_) {
-          content = null;
-        }
+    // Generate sections in parallel with a bounded worker pool. Overview is
+    // first in the queue, so it lands quickly and the (default) Overview tab
+    // fills in while the remaining sections stream in.
+    final queue = List<String>.from(JobDetailParser.sections);
+    const concurrency = 4;
+    Future<void> worker() async {
+      while (queue.isNotEmpty) {
+        await _fetchAndMerge(queue.removeAt(0), qualifiedTitle, profile);
       }
-      if (content != null) {
-        _set(_state.copyWith(detail: JobDetailParser.merge(_state.detail, section, content)));
-      }
-      loaded++;
-      _set(_state.copyWith(loaded: loaded));
     }
+
+    await Future.wait(List.generate(concurrency, (_) => worker()));
 
     _set(_state.copyWith(done: true));
 
@@ -172,6 +166,25 @@ class JobDetailController extends ChangeNotifier {
     }
   }
 
+  /// Fetches one section (up to 2 attempts) and merges it. The read-merge-set
+  /// after the `await` runs synchronously, so concurrent workers never clobber
+  /// each other's sections (each maps to a distinct JobDetail field).
+  Future<void> _fetchAndMerge(String section, String title, Map<String, dynamic> profile) async {
+    Map? content;
+    for (var attempt = 0; attempt < 2 && content == null; attempt++) {
+      try {
+        content = await api.careerDetails(careerTitle: title, sectionType: section, profile: profile);
+      } catch (_) {
+        content = null;
+      }
+    }
+    if (content != null) {
+      _set(_state.copyWith(detail: JobDetailParser.merge(_state.detail, section, content)));
+    }
+    _loaded++;
+    _set(_state.copyWith(loaded: _loaded));
+  }
+
   Future<void> retry() async {
     _set(_state.copyWith(
       detail: JobDetail.empty(roleId, 'Current Level'),
@@ -183,16 +196,27 @@ class JobDetailController extends ChangeNotifier {
     await _generate();
   }
 
-  Map<String, dynamic> _buildProfile(String title) => {
-        'education': '',
-        'career_title': title,
-        'career_domain': title,
-        'strict_domain': true,
-        'instruction_institutes':
-            'Generate ONLY institutes that offer courses/degrees directly relevant to $title.',
-        'instruction_companies': 'Generate ONLY companies that actively hire $title professionals.',
-        'instruction_experts': 'Generate ONLY real industry experts who are actual $title professionals.',
-      };
+  Map<String, dynamic> _buildProfile(String title) {
+    // Load the personalization profile saved at assessment submit.
+    Map<String, dynamic> stored = const {};
+    final raw = storage.getUserProfileRaw();
+    if (raw != null) {
+      try {
+        stored = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+      } catch (_) {/* ignore malformed cache */}
+    }
+    return {
+      ...stored,
+      'education': stored['education'] ?? '',
+      'career_title': title,
+      'career_domain': title,
+      'strict_domain': true,
+      'instruction_institutes':
+          'Generate ONLY institutes that offer courses/degrees directly relevant to $title.',
+      'instruction_companies': 'Generate ONLY companies that actively hire $title professionals.',
+      'instruction_experts': 'Generate ONLY real industry experts who are actual $title professionals.',
+    };
+  }
 
   /// Appends a domain hint to the title (compact port of the web `domainQualify`).
   String _domainQualify(String title) {

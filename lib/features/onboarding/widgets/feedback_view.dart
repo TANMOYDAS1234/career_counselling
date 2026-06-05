@@ -49,14 +49,7 @@ class FeedbackView extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: state.feedbackLoading
-                  ? Column(
-                      children: [
-                        const CircularProgressIndicator(color: AppColors.primary600),
-                        const SizedBox(height: AppSpacing.s2),
-                        TranslatedText('Analysing your answers...',
-                            style: TextStyle(color: AppColors.primary600, fontWeight: FontWeight.w600)),
-                      ],
-                    )
+                  ? const _LoadingProgress()
                   : TranslatedText(
                       state.feedbackMessage ?? '',
                       style: const TextStyle(fontSize: 16, height: 1.55, color: AppColors.neutral700),
@@ -71,6 +64,50 @@ class FeedbackView extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Animated progress bar + percentage shown while module feedback loads.
+class _LoadingProgress extends StatelessWidget {
+  const _LoadingProgress();
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.05, end: 0.92),
+      duration: const Duration(seconds: 6),
+      curve: Curves.easeOut,
+      builder: (context, value, _) {
+        final pct = (value * 100).round();
+        return Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              child: LinearProgressIndicator(
+                value: value,
+                minHeight: 8,
+                backgroundColor: AppColors.neutral100,
+                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary600),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('$pct%  ',
+                    style: const TextStyle(
+                        color: AppColors.primary600, fontWeight: FontWeight.w700, fontSize: 13)),
+                const Flexible(
+                  child: TranslatedText('Analysing your answers...',
+                      style: TextStyle(
+                          color: AppColors.primary600, fontWeight: FontWeight.w600, fontSize: 13)),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

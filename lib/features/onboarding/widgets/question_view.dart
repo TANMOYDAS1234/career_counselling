@@ -315,6 +315,31 @@ class _Controls extends ConsumerWidget {
   final bool isModuleEnd;
   final bool canProceed;
 
+  Future<void> _confirmSkip(BuildContext context, OnboardingController c) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.warning_amber_rounded, color: AppColors.amber600, size: 32),
+        title: const TranslatedText('Skip this question?'),
+        content: const TranslatedText(
+          'Every answer shapes your career matches and report. Skipping this question makes your results less accurate and personalized. Skip anyway?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const TranslatedText('Go back'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.destructive),
+            child: const TranslatedText('Skip anyway'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) c.skip();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = ref.read(onboardingControllerProvider.notifier);
@@ -322,32 +347,28 @@ class _Controls extends ConsumerWidget {
         ? (question.number == 20 ? 'Complete Assessment' : 'Complete Module')
         : 'Next Question';
 
-    if (question.optional) {
-      return Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () => c.skip(),
-              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-              child: const Text('Skip'),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.s2),
-          Expanded(
-            child: GradientButton(
-              label: label,
-              trailingIcon: isModuleEnd ? Icons.check_rounded : Icons.arrow_forward_rounded,
-              onPressed: () => c.next(),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return GradientButton(
+    final nextButton = GradientButton(
       label: label,
       trailingIcon: isModuleEnd ? Icons.check_rounded : Icons.arrow_forward_rounded,
-      onPressed: canProceed ? () => c.next() : null,
+      // Optional (text) questions can advance without input; others need an answer.
+      onPressed: (question.optional || canProceed) ? () => c.next() : null,
+    );
+
+    // Important questions are required to generate a result — no skip allowed.
+    if (question.important) return nextButton;
+
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () => _confirmSkip(context, c),
+            style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+            child: const TranslatedText('Skip'),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.s2),
+        Expanded(child: nextButton),
+      ],
     );
   }
 }

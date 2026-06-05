@@ -73,6 +73,7 @@ class OnboardingState {
 
 class OnboardingController extends Notifier<OnboardingState> {
   late final ApiService _api = ref.read(apiServiceProvider);
+  late final _storage = ref.read(localStorageProvider);
 
   String get _username =>
       ref.read(authControllerProvider).user?.email ??
@@ -240,6 +241,10 @@ class OnboardingController extends Notifier<OnboardingState> {
   /// Persist the full questionnaire. Returns true on success.
   Future<bool> submit() async {
     state = state.copyWith(submitting: true, clearError: true);
+    // Persist a personalization profile for the job-detail AI prompts.
+    try {
+      await _storage.setUserProfileRaw(jsonEncode(_buildUserProfile()));
+    } catch (_) {/* non-critical */}
     try {
       final ok = _username.isEmpty
           ? false
@@ -251,6 +256,40 @@ class OnboardingController extends Notifier<OnboardingState> {
       state = state.copyWith(submitting: false, error: e.message);
       return false;
     }
+  }
+
+  /// Compact, AI-friendly profile derived from the basic info + answers. The
+  /// backend (`generate_detailed_content`) reads `education`/`testimony` and
+  /// also interpolates the whole map, so richer context = more personalized.
+  Map<String, dynamic> _buildUserProfile() {
+    final b = state.basic;
+    final a = state.answers;
+    const eduCode = {'9': 'class-9', '10': 'class-10', '11': 'class-11', '12': 'class-12', 'graduated': 'graduated'};
+    const eduLabel = {'9': 'Class 9', '10': 'Class 10', '11': 'Class 11', '12': 'Class 12', 'graduated': 'Graduated'};
+    final testimony = ((a['careerThinking'] as String?)?.trim().isNotEmpty ?? false)
+        ? a['careerThinking'] as String
+        : ((a['selfInitiated'] as String?) ?? '');
+    return {
+      'name': b.name,
+      'education': eduCode[b.classLevel] ?? b.classLevel,
+      'education_label': eduLabel[b.classLevel] ?? b.classLevel,
+      'board': b.board,
+      'district': b.district,
+      'favorite_subjects': a['favoriteSubjects'] ?? const [],
+      'difficult_subject': a['difficultSubject'] ?? '',
+      'subject_marks': a['subjectMarks'] ?? const {},
+      'study_experience': a['studyExperience'] ?? '',
+      'interests': a['outsideActivities'] ?? const [],
+      'career_values': a['careerValues'] ?? const [],
+      'five_year_vision': a['fiveYearVision'] ?? '',
+      'aptitude': {
+        'quantitative': a['numberSenseScore'],
+        'verbal': a['wordSenseScore'],
+        'spatial': a['shapeSenseScore'],
+        'logical': a['logicSenseScore'],
+      },
+      'testimony': testimony,
+    };
   }
 }
 

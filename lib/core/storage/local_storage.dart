@@ -63,6 +63,12 @@ class LocalStorage {
   Future<void> setRecommendationsRaw(String json) =>
       _prefs.setString(_kRecommendations, json);
 
+  // ── User profile (assessment context for AI personalization) ───────────────
+  static const _kUserProfile = 'userProfile';
+  String? getUserProfileRaw() => _prefs.getString(_kUserProfile);
+  Future<void> setUserProfileRaw(String json) =>
+      _prefs.setString(_kUserProfile, json);
+
   // ── Job-detail cache, keyed by roleId ──────────────────────────────────────
   String? getJobDetailRaw(String roleId) =>
       _prefs.getString('$_kJobDetailPrefix$roleId');
