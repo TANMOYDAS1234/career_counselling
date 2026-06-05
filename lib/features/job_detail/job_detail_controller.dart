@@ -142,7 +142,7 @@ class JobDetailController extends ChangeNotifier {
     // first in the queue, so it lands quickly and the (default) Overview tab
     // fills in while the remaining sections stream in.
     final queue = List<String>.from(JobDetailParser.sections);
-    const concurrency = 4;
+    const concurrency = 6;
     Future<void> worker() async {
       while (queue.isNotEmpty) {
         await _fetchAndMerge(queue.removeAt(0), qualifiedTitle, profile);

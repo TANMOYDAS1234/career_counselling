@@ -121,17 +121,23 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
           listenable: _controller,
           builder: (context, _) {
             final s = _controller.state;
+            final building = !s.done;
             return Column(
               children: [
                 _Header(title: s.roleTitle, onPdf: _downloadPdf, busy: _downloadingPdf),
-                if (!s.done) _ProgressBanner(loaded: s.loaded, total: s.total),
-                _SectionNav(selected: _section, onSelect: (i) => setState(() => _section = i)),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.pageH, AppSpacing.s1, AppSpacing.pageH, AppSpacing.s5),
-                    child: _SectionContent(state: s, section: _section),
+                if (building && s.loaded == 0)
+                  // Nothing ready yet (incl. server cold-start) — reassure + show progress.
+                  Expanded(child: _InitialLoader(loaded: s.loaded, total: s.total))
+                else ...[
+                  if (building) _ProgressBanner(loaded: s.loaded, total: s.total),
+                  _SectionNav(selected: _section, onSelect: (i) => setState(() => _section = i)),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(AppSpacing.pageH, AppSpacing.s1, AppSpacing.pageH, AppSpacing.s5),
+                      child: _SectionContent(state: s, section: _section),
+                    ),
                   ),
-                ),
+                ],
               ],
             );
           },
@@ -179,22 +185,88 @@ class _ProgressBanner extends StatelessWidget {
   final int loaded, total;
   @override
   Widget build(BuildContext context) {
+    final pct = total == 0 ? 0 : ((loaded / total) * 100).round();
     return Container(
       width: double.infinity,
       color: AppColors.primary50,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageH, vertical: 10),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            width: 16, height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary600),
+          Row(
+            children: [
+              const SizedBox(
+                width: 14, height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary600),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: TranslatedText('Adding more details — you can read what’s ready',
+                    style: TextStyle(fontSize: 12.5, color: AppColors.primary700, fontWeight: FontWeight.w600)),
+              ),
+              Text('$loaded/$total · $pct%',
+                  style: const TextStyle(fontSize: 12.5, color: AppColors.primary700, fontWeight: FontWeight.w700)),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TranslatedText('Generating your report... ($loaded/$total sections)',
-                style: const TextStyle(fontSize: 13, color: AppColors.primary700, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: total == 0 ? null : loaded / total,
+              minHeight: 5,
+              backgroundColor: AppColors.primary100,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary600),
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Full-screen reassuring loader shown until the first section is ready
+/// (covers server cold-start on free hosting).
+class _InitialLoader extends StatelessWidget {
+  const _InitialLoader({required this.loaded, required this.total});
+  final int loaded, total;
+  @override
+  Widget build(BuildContext context) {
+    final pct = total == 0 ? 0 : ((loaded / total) * 100).round();
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.s4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: const BoxDecoration(gradient: AppGradients.primary, shape: BoxShape.circle),
+              child: const Icon(Icons.auto_awesome, color: AppColors.white, size: 34),
+            ),
+            const SizedBox(height: AppSpacing.s3),
+            TranslatedText('Building your career report', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: AppSpacing.s1),
+            const TranslatedText(
+              'Our AI is putting together a personalized report just for you. This can take up to a minute — please stay on this screen.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.neutral600, height: 1.5),
+            ),
+            const SizedBox(height: AppSpacing.s3),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: total == 0 ? null : loaded / total,
+                minHeight: 8,
+                backgroundColor: AppColors.neutral100,
+                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary600),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s1),
+            Text('$loaded of $total sections ready · $pct%',
+                style: const TextStyle(color: AppColors.primary700, fontWeight: FontWeight.w700, fontSize: 13)),
+          ],
+        ),
       ),
     );
   }

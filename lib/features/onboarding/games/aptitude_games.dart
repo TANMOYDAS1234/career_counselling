@@ -313,13 +313,15 @@ class _ImageOptionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const labels = ['Option A', 'Option B', 'Option C', 'Option D'];
-    return GridView.count(
-      crossAxisCount: 2,
+    return GridView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.s2,
-      crossAxisSpacing: AppSpacing.s2,
-      childAspectRatio: 1.1,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: AppSpacing.s2,
+        crossAxisSpacing: AppSpacing.s2,
+        mainAxisExtent: 170,
+      ),
       children: [
         for (var i = 0; i < q.optionImages.length; i++)
           _Tappable(
@@ -349,13 +351,15 @@ class _WordsGrid extends StatelessWidget {
   final void Function(Object) onTap;
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
+    return GridView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.s2,
-      crossAxisSpacing: AppSpacing.s2,
-      childAspectRatio: 2.4,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: AppSpacing.s2,
+        crossAxisSpacing: AppSpacing.s2,
+        mainAxisExtent: 60,
+      ),
       children: [
         for (final w in q.words)
           _Tappable(
@@ -363,8 +367,11 @@ class _WordsGrid extends StatelessWidget {
             color: color,
             onTap: () => onTap(w),
             child: Center(
-              child: TranslatedText(w,
-                  style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.neutral900)),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: TranslatedText(w,
+                    style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.neutral900)),
+              ),
             ),
           ),
       ],
@@ -383,13 +390,15 @@ class _TextOptions extends StatelessWidget {
     // Short numeric/percentage options → 2-col grid; long text → single column.
     final allShort = q.options.every((o) => o.toString().length <= 8);
     if (allShort) {
-      return GridView.count(
-        crossAxisCount: 2,
+      return GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        mainAxisSpacing: AppSpacing.s2,
-        crossAxisSpacing: AppSpacing.s2,
-        childAspectRatio: 2.4,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: AppSpacing.s2,
+          crossAxisSpacing: AppSpacing.s2,
+          mainAxisExtent: 60,
+        ),
         children: [
           for (final o in q.options)
             _Tappable(
@@ -397,8 +406,11 @@ class _TextOptions extends StatelessWidget {
               color: color,
               onTap: () => onTap(o),
               child: Center(
-                child: TranslatedText('$o',
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: TranslatedText('$o',
+                      style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
+                ),
               ),
             ),
         ],
