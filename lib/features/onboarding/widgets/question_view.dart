@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/i18n/translated_text.dart';
@@ -354,11 +355,40 @@ class _Controls extends ConsumerWidget {
       onPressed: (question.optional || canProceed) ? () => c.next() : null,
     );
 
+    // Back to the previous question (or basic info from Q1) — lets students fix answers.
+    final backButton = SizedBox(
+      height: 52,
+      width: 52,
+      child: OutlinedButton(
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          c.previous();
+        },
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          foregroundColor: AppColors.neutral600,
+          side: const BorderSide(color: AppColors.neutral300),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        ),
+        child: const Icon(Icons.arrow_back_rounded, size: 20),
+      ),
+    );
+
     // Important questions are required to generate a result — no skip allowed.
-    if (question.important) return nextButton;
+    if (question.important) {
+      return Row(
+        children: [
+          backButton,
+          const SizedBox(width: AppSpacing.s2),
+          Expanded(child: nextButton),
+        ],
+      );
+    }
 
     return Row(
       children: [
+        backButton,
+        const SizedBox(width: AppSpacing.s2),
         Expanded(
           child: OutlinedButton(
             onPressed: () => _confirmSkip(context, c),

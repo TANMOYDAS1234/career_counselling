@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/i18n/translated_text.dart';
 import '../../../core/theme/app_colors.dart';
@@ -39,7 +40,8 @@ class FeedbackView extends ConsumerWidget {
               child: const Icon(Icons.auto_awesome, color: AppColors.white, size: 30),
             ),
             const SizedBox(height: AppSpacing.s2),
-            TranslatedText("Here's what we noticed", style: Theme.of(context).textTheme.titleLarge),
+            TranslatedText("Here's what we noticed",
+                style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
             const SizedBox(height: AppSpacing.s3),
             Container(
               width: double.infinity,
@@ -50,10 +52,7 @@ class FeedbackView extends ConsumerWidget {
               ),
               child: state.feedbackLoading
                   ? const _LoadingProgress()
-                  : TranslatedText(
-                      state.feedbackMessage ?? '',
-                      style: const TextStyle(fontSize: 16, height: 1.55, color: AppColors.neutral700),
-                    ),
+                  : _FeedbackPoints(message: state.feedbackMessage ?? ''),
             ),
             const SizedBox(height: AppSpacing.s3),
             GradientButton(
@@ -65,6 +64,64 @@ class FeedbackView extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+/// Renders the AI feedback as up to 4 short bullet points (handles both
+/// bullet-form and paragraph-form responses), in a friendly display font.
+class _FeedbackPoints extends StatelessWidget {
+  const _FeedbackPoints({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final points = _toPoints(message);
+    if (points.isEmpty) {
+      return TranslatedText(message,
+          style: GoogleFonts.outfit(fontSize: 15.5, height: 1.5, color: AppColors.neutral700));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final p in points)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Icon(Icons.check_circle_rounded, size: 18, color: AppColors.primary600),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TranslatedText(p,
+                      style: GoogleFonts.outfit(fontSize: 15.5, height: 1.4, color: AppColors.neutral800)),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// Splits feedback into 3–4 short points (newline/bullet first, else sentences).
+  static List<String> _toPoints(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return const [];
+    var parts = text
+        .split(RegExp(r'[\n•]'))
+        .map((p) => p.replaceFirst(RegExp(r'^[\s\-*•.]+'), '').trim())
+        .where((p) => p.length > 2)
+        .toList();
+    if (parts.length < 2) {
+      parts = text
+          .split(RegExp(r'(?<=[.!?])\s+'))
+          .map((p) => p.trim())
+          .where((p) => p.length > 2)
+          .toList();
+    }
+    return parts.take(4).toList();
   }
 }
 

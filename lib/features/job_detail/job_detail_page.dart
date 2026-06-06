@@ -15,6 +15,7 @@ import '../../core/theme/app_gradients.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_background.dart';
 import '../../core/widgets/edubot_app_bar.dart';
+import '../../core/widgets/rotating_status.dart';
 import '../auth/auth_controller.dart';
 import 'job_detail_controller.dart';
 import 'widgets/job_detail_sections.dart';
@@ -74,11 +75,13 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
       return;
     }
     setState(() => _downloadingPdf = true);
-    final messenger = ScaffoldMessenger.of(context)
-      ..showSnackBar(const SnackBar(
-        content: TranslatedText('Generating PDF…'),
-        duration: Duration(minutes: 1),
-      ));
+    // Engaging "thinking" dialog while the PDF renders server-side.
+    showDialog(context: context, barrierDismissible: false, builder: (_) => const _PdfDialog());
+    final messenger = ScaffoldMessenger.of(context);
+    void closeDialog() {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    }
+
     try {
       final api = ref.read(apiServiceProvider);
       final lang = ref.read(languageProvider);
@@ -92,18 +95,18 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
       final safe = s.roleTitle.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-');
       final file = File('${dir.path}/EduBot-Career-Report-$safe.pdf');
       await file.writeAsBytes(bytes, flush: true);
-      messenger.hideCurrentSnackBar();
+      closeDialog();
       final res = await OpenFilex.open(file.path);
       if (res.type != ResultType.done && mounted) {
         messenger.showSnackBar(SnackBar(content: TranslatedText('Saved to ${file.path}')));
       }
     } on ApiException catch (e) {
-      messenger.hideCurrentSnackBar();
+      closeDialog();
       messenger.showSnackBar(
         SnackBar(content: TranslatedText(e.message), backgroundColor: AppColors.destructive),
       );
     } catch (_) {
-      messenger.hideCurrentSnackBar();
+      closeDialog();
       messenger.showSnackBar(
         const SnackBar(content: TranslatedText('Could not generate the PDF.'), backgroundColor: AppColors.destructive),
       );
@@ -246,12 +249,15 @@ class _InitialLoader extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.s3),
             TranslatedText('Building your career report', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: AppSpacing.s1),
-            const TranslatedText(
-              'Our AI is putting together a personalized report just for you. This can take up to a minute — please stay on this screen.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.neutral600, height: 1.5),
+            const SizedBox(height: AppSpacing.s2),
+            const SizedBox(
+              height: 44,
+              child: RotatingStatus(messages: kReportThinkingMessages),
             ),
+            const SizedBox(height: 4),
+            const TranslatedText('This can take up to a minute on first load.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.neutral500, fontSize: 12.5)),
             const SizedBox(height: AppSpacing.s3),
             ClipRRect(
               borderRadius: BorderRadius.circular(999),
@@ -371,5 +377,42 @@ class _SectionContent extends StatelessWidget {
       );
     }
     return widgets[section];
+  }
+}
+
+/// Modal shown while the PDF renders server-side — rotating "thinking" lines so
+/// the wait feels alive instead of a static "Generating PDF".
+class _PdfDialog extends StatelessWidget {
+  const _PdfDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.s4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: const BoxDecoration(gradient: AppGradients.primary, shape: BoxShape.circle),
+              child: const Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.white),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s3),
+            TranslatedText('Preparing your PDF', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: AppSpacing.s1),
+            const SizedBox(
+              height: 40,
+              child: RotatingStatus(messages: kPdfThinkingMessages),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

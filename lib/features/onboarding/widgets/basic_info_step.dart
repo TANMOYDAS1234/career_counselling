@@ -16,7 +16,9 @@ const _classLevels = [
   ('10', 'Class 10'),
   ('11', 'Class 11'),
   ('12', 'Class 12'),
+  ('graduation', 'Graduation (pursuing)'),
   ('graduated', 'Graduated'),
+  ('postgrad', 'Postgraduate'),
 ];
 
 const _boards = [
@@ -27,7 +29,25 @@ const _boards = [
   ('other', 'Other'),
 ];
 
-/// Stage 0 — collects name, class, board, district, parent mobile.
+// For graduates/PG, "board" doesn't apply — we ask their degree/programme instead
+// (stored in the same field so the AI sees e.g. "B.Com" as their education context).
+const _degrees = [
+  ('btech', 'B.Tech / B.E.'),
+  ('bsc', 'B.Sc'),
+  ('bcom', 'B.Com'),
+  ('ba', 'B.A.'),
+  ('bba', 'BBA'),
+  ('bca', 'BCA'),
+  ('bpharm', 'B.Pharm'),
+  ('mbbs', 'MBBS / BDS'),
+  ('llb', 'LLB'),
+  ('other', 'Other'),
+];
+
+bool _isGraduate(String level) =>
+    level == 'graduation' || level == 'graduated' || level == 'postgrad';
+
+/// Stage 0 — collects name, class/level, board-or-degree, district, mobile.
 class BasicInfoStep extends ConsumerStatefulWidget {
   const BasicInfoStep({super.key});
 
@@ -64,14 +84,27 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
     super.dispose();
   }
 
+  void _selectClass(String v) {
+    setState(() {
+      // Reset the second field when switching between school and graduate sets.
+      if (_isGraduate(v) != _isGraduate(_classLevel)) _board = '';
+      _classLevel = v;
+    });
+  }
+
   Future<void> _submit() async {
+    final isGrad = _isGraduate(_classLevel);
     final formOk = _formKey.currentState!.validate();
     final selectionsOk = _classLevel.isNotEmpty && _board.isNotEmpty;
     setState(() => _showConsentError = !_consent);
     if (!formOk || !selectionsOk || !_consent) {
       if (!selectionsOk) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: TranslatedText('Please select your class and board.')),
+          SnackBar(
+            content: TranslatedText(
+              isGrad ? 'Please select your level and degree.' : 'Please select your class and board.',
+            ),
+          ),
         );
       }
       return;
@@ -91,6 +124,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
   Widget build(BuildContext context) {
     final loading = ref.watch(onboardingControllerProvider.select((s) => s.basicLoading));
     final error = ref.watch(onboardingControllerProvider.select((s) => s.error));
+    final isGrad = _isGraduate(_classLevel);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.pageH),
@@ -116,16 +150,17 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
                     validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
                   ),
                   const SizedBox(height: AppSpacing.s2),
-                  const _FieldLabel('Current Class'),
+                  const _FieldLabel('Current Level'),
                   _ChipWrap(
                     options: _classLevels,
                     selected: _classLevel,
-                    onSelect: (v) => setState(() => _classLevel = v),
+                    onSelect: _selectClass,
                   ),
                   const SizedBox(height: AppSpacing.s2),
-                  const _FieldLabel('Education Board'),
+                  // Board for school students; degree/programme for graduates.
+                  _FieldLabel(isGrad ? 'Degree / Programme' : 'Education Board'),
                   _ChipWrap(
-                    options: _boards,
+                    options: isGrad ? _degrees : _boards,
                     selected: _board,
                     onSelect: (v) => setState(() => _board = v),
                   ),
@@ -138,7 +173,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
                   ),
                   const SizedBox(height: AppSpacing.s2),
                   LabeledField(
-                    label: 'Parent / Guardian Mobile',
+                    label: isGrad ? 'Mobile Number' : 'Parent / Guardian Mobile',
                     controller: _mobile,
                     hint: '10-digit number',
                     keyboardType: TextInputType.phone,
@@ -148,6 +183,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
                   const SizedBox(height: AppSpacing.s2),
                   _ConsentRow(
                     value: _consent,
+                    isGraduate: isGrad,
                     showError: _showConsentError,
                     onChanged: (v) => setState(() {
                       _consent = v;
@@ -210,10 +246,16 @@ class _ChipWrap extends StatelessWidget {
 }
 
 class _ConsentRow extends StatelessWidget {
-  const _ConsentRow({required this.value, required this.onChanged, required this.showError});
+  const _ConsentRow({
+    required this.value,
+    required this.onChanged,
+    required this.showError,
+    this.isGraduate = false,
+  });
   final bool value;
   final ValueChanged<bool> onChanged;
   final bool showError;
+  final bool isGraduate;
 
   @override
   Widget build(BuildContext context) {
@@ -234,10 +276,12 @@ class _ConsentRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.s1),
-            const Expanded(
+            Expanded(
               child: TranslatedText(
-                'I confirm a parent/guardian consents to this assessment.',
-                style: TextStyle(fontSize: 13, color: AppColors.neutral600),
+                isGraduate
+                    ? 'I consent to taking this career assessment.'
+                    : 'I confirm a parent/guardian consents to this assessment.',
+                style: const TextStyle(fontSize: 13, color: AppColors.neutral600),
               ),
             ),
           ],

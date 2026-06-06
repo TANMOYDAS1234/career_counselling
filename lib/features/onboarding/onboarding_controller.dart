@@ -198,6 +198,17 @@ class OnboardingController extends Notifier<OnboardingState> {
     await next();
   }
 
+  /// Step back: to the previous question, or to the basic-info screen from Q1.
+  /// Answers already given are kept so the student can review/change them.
+  void previous() {
+    final q = state.currentQuestion;
+    if (q <= 1) {
+      state = state.copyWith(stage: OnboardingStage.basicInfo);
+    } else {
+      state = state.copyWith(stage: OnboardingStage.question, currentQuestion: q - 1);
+    }
+  }
+
   Future<void> _loadFeedback(int moduleNumber) async {
     state = state.copyWith(stage: OnboardingStage.feedback, feedbackLoading: true, clearFeedback: true);
     try {
@@ -264,8 +275,14 @@ class OnboardingController extends Notifier<OnboardingState> {
   Map<String, dynamic> _buildUserProfile() {
     final b = state.basic;
     final a = state.answers;
-    const eduCode = {'9': 'class-9', '10': 'class-10', '11': 'class-11', '12': 'class-12', 'graduated': 'graduated'};
-    const eduLabel = {'9': 'Class 9', '10': 'Class 10', '11': 'Class 11', '12': 'Class 12', 'graduated': 'Graduated'};
+    const eduCode = {
+      '9': 'class-9', '10': 'class-10', '11': 'class-11', '12': 'class-12',
+      'graduation': 'graduation', 'graduated': 'graduated', 'postgrad': 'postgrad',
+    };
+    const eduLabel = {
+      '9': 'Class 9', '10': 'Class 10', '11': 'Class 11', '12': 'Class 12',
+      'graduation': 'Graduation (pursuing)', 'graduated': 'Graduated', 'postgrad': 'Postgraduate',
+    };
     final testimony = ((a['careerThinking'] as String?)?.trim().isNotEmpty ?? false)
         ? a['careerThinking'] as String
         : ((a['selfInitiated'] as String?) ?? '');
