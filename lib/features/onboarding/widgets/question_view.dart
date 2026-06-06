@@ -228,13 +228,51 @@ class _SubjectGrid extends ConsumerWidget {
   final Question question;
   final bool multi;
 
+  Future<void> _addOther(BuildContext context, WidgetRef ref) async {
+    final c = ref.read(onboardingControllerProvider.notifier);
+    final tc = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const TranslatedText('Add your subject'),
+        content: TextField(
+          controller: tc,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(hintText: 'e.g., Urdu, Robotics, Statistics'),
+          onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const TranslatedText('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, tc.text), child: const TranslatedText('Add')),
+        ],
+      ),
+    );
+    tc.dispose();
+    final clean = name?.trim() ?? '';
+    if (clean.isEmpty) return;
+    c.addCustomSubject(clean);
+    if (multi) {
+      c.toggleSubject(clean, question.maxSelect ?? 3);
+    } else {
+      c.selectSingle('difficultSubject', clean);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = ref.read(onboardingControllerProvider.notifier);
     final favs = ref.watch(onboardingControllerProvider
         .select((s) => (s.answers['favoriteSubjects'] as List?)?.cast<String>() ?? const <String>[]));
     final difficult = ref.watch(onboardingControllerProvider.select((s) => s.answers['difficultSubject'] as String?));
+    final basic = ref.watch(onboardingControllerProvider.select((s) => s.basic));
+    final custom = ref.watch(onboardingControllerProvider
+        .select((s) => (s.answers['customSubjects'] as List?)?.cast<String>() ?? const <String>[]));
     final maxSelect = question.maxSelect ?? 3;
+
+    // Subjects relevant to this student's class/board, plus anything they typed.
+    final base = subjectsFor(basic.classLevel, basic.board);
+    final subjects = [...base, ...custom.where((s) => !base.contains(s))];
 
     return Column(
       children: [
@@ -242,7 +280,7 @@ class _SubjectGrid extends ConsumerWidget {
           spacing: AppSpacing.s1,
           runSpacing: AppSpacing.s1,
           children: [
-            for (final subject in kSubjects)
+            for (final subject in subjects)
               ChoiceChipCard(
                 label: subject,
                 color: multi ? AppColors.primary600 : AppColors.amber600,
@@ -252,6 +290,12 @@ class _SubjectGrid extends ConsumerWidget {
                     ? c.toggleSubject(subject, maxSelect)
                     : c.selectSingle('difficultSubject', subject),
               ),
+            ChoiceChipCard(
+              label: '+ Other',
+              color: AppColors.neutral600,
+              selected: false,
+              onTap: () => _addOther(context, ref),
+            ),
           ],
         ),
         if (multi) ...[

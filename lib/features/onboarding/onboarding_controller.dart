@@ -139,6 +139,21 @@ class OnboardingController extends Notifier<OnboardingState> {
     state = state.copyWith(answers: _put('subjectMarks', marks));
   }
 
+  /// Custom subjects the student typed via "Other" — shown alongside the
+  /// curated list across the favourite/difficult/marks academics screens.
+  List<String> get customSubjects =>
+      (state.answers['customSubjects'] as List?)?.cast<String>() ?? const [];
+
+  void addCustomSubject(String name) {
+    final clean = name.trim();
+    if (clean.isEmpty) return;
+    final current = List<String>.from(customSubjects);
+    if (!current.any((s) => s.toLowerCase() == clean.toLowerCase())) {
+      current.add(clean);
+      state = state.copyWith(answers: _put('customSubjects', current));
+    }
+  }
+
   // ── Validation for the current question ────────────────────────────────
   bool get canProceed {
     final q = state.question;

@@ -3,12 +3,30 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/question.dart';
 
-/// The 12 subjects offered in Q8/Q9.
-const kSubjects = [
-  'Physics', 'Chemistry', 'Biology', 'Mathematics',
-  'English', 'Bengali', 'Computer Science', 'Economics',
-  'Geography', 'History', 'Political Science', 'Accountancy',
-];
+/// A broad, India-focused subject list for the academics questions — varies by
+/// whether the student is still in school or already a graduate. "Other" lets
+/// them type any subject not in the list (e.g. a regional language or a niche
+/// degree subject).
+List<String> subjectsFor(String classLevel, String board) {
+  const grad = [
+    'Engineering', 'Computer Science', 'Information Technology', 'Mathematics',
+    'Physics', 'Chemistry', 'Biology', 'Biotechnology', 'Commerce', 'Accountancy',
+    'Economics', 'Business Management', 'Finance', 'Law', 'Medicine', 'Pharmacy',
+    'Nursing', 'Design', 'Architecture', 'Psychology', 'Sociology',
+    'Political Science', 'History', 'Geography', 'English Literature',
+    'Mass Communication', 'Statistics', 'Data Science', 'Environmental Science',
+  ];
+  const school = [
+    'Physics', 'Chemistry', 'Biology', 'Mathematics', 'Computer Science',
+    'Information Practices', 'English', 'Hindi', 'Bengali', 'Sanskrit',
+    'Accountancy', 'Business Studies', 'Economics', 'Geography', 'History',
+    'Political Science', 'Sociology', 'Psychology', 'Physical Education',
+    'Fine Arts', 'Home Science', 'Environmental Science', 'Statistics',
+  ];
+  final isGrad =
+      classLevel == 'graduation' || classLevel == 'graduated' || classLevel == 'postgrad';
+  return isGrad ? grad : school;
+}
 
 /// Marks bands for Q10 (value -> label).
 const kMarkBands = [
@@ -188,13 +206,14 @@ const List<Question> kQuestions = [
   ),
   Question(
     number: 16, module: 5, fieldKey: 'familyBudget', kind: QuestionKind.single,
-    prompt: 'Have you talked to your family about the cost of higher education?',
+    prompt: 'What is a realistic budget for your studies?',
     headerIcon: Icons.attach_money_rounded, headerColor: AppColors.accent100,
     options: [
-      QuestionOption('clear-budget', Icons.check_circle_outline_rounded, 'Yes, and we have a clear budget'),
-      QuestionOption('depends', Icons.help_outline_rounded, 'Yes, but it depends on the course'),
-      QuestionOption('not-really', Icons.sentiment_neutral_rounded, 'Not really'),
-      QuestionOption('no-money-factor', Icons.auto_awesome, "I'd rather not factor money into this right now"),
+      QuestionOption('under-2l', Icons.savings_outlined, 'Under ₹2 lakh total'),
+      QuestionOption('2-5l', Icons.account_balance_wallet_outlined, '₹2–5 lakh'),
+      QuestionOption('5-10l', Icons.account_balance_outlined, '₹5–10 lakh'),
+      QuestionOption('above-10l', Icons.diamond_outlined, 'Above ₹10 lakh'),
+      QuestionOption('not-sure', Icons.help_outline_rounded, 'Not sure yet'),
     ],
   ),
   Question(

@@ -59,8 +59,14 @@ abstract class ReportLabels {
   };
 
   static const Map<String, String> budget = {
-    'clear-budget': 'Yes — clear budget discussed',
-    'depends': 'Yes — depends on the course',
+    'under-2l': 'Under ₹2 lakh total',
+    '2-5l': '₹2–5 lakh',
+    '5-10l': '₹5–10 lakh',
+    'above-10l': 'Above ₹10 lakh',
+    'not-sure': 'Not sure yet',
+    // Legacy values (older assessments):
+    'clear-budget': 'Clear budget discussed',
+    'depends': 'Depends on the course',
     'not-really': 'Not really discussed',
     'no-money-factor': 'Prefers not to factor money in',
   };

@@ -60,6 +60,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
   final _name = TextEditingController();
   final _district = TextEditingController();
   final _mobile = TextEditingController();
+  final _boardOther = TextEditingController();
   String _classLevel = '';
   String _board = '';
   bool _consent = false;
@@ -73,7 +74,14 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
     _district.text = basic.district;
     _mobile.text = basic.parentMobile;
     _classLevel = basic.classLevel;
-    _board = basic.board;
+    // Restore a custom (typed) board/degree as "Other".
+    final known = {..._boards.map((e) => e.$1), ..._degrees.map((e) => e.$1)};
+    if (basic.board.isNotEmpty && !known.contains(basic.board)) {
+      _board = 'other';
+      _boardOther.text = basic.board;
+    } else {
+      _board = basic.board;
+    }
   }
 
   @override
@@ -81,6 +89,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
     _name.dispose();
     _district.dispose();
     _mobile.dispose();
+    _boardOther.dispose();
     super.dispose();
   }
 
@@ -94,15 +103,20 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
 
   Future<void> _submit() async {
     final isGrad = _isGraduate(_classLevel);
+    // When "Other" is chosen, use the typed board/degree value.
+    final effectiveBoard = _board == 'other' ? _boardOther.text.trim() : _board;
     final formOk = _formKey.currentState!.validate();
-    final selectionsOk = _classLevel.isNotEmpty && _board.isNotEmpty;
+    final selectionsOk =
+        _classLevel.isNotEmpty && _board.isNotEmpty && (_board != 'other' || effectiveBoard.isNotEmpty);
     setState(() => _showConsentError = !_consent);
     if (!formOk || !selectionsOk || !_consent) {
       if (!selectionsOk) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: TranslatedText(
-              isGrad ? 'Please select your level and degree.' : 'Please select your class and board.',
+              _board == 'other'
+                  ? (isGrad ? 'Please type your degree / programme.' : 'Please type your board.')
+                  : (isGrad ? 'Please select your level and degree.' : 'Please select your class and board.'),
             ),
           ),
         );
@@ -113,7 +127,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
     controller.updateBasic(ref.read(onboardingControllerProvider).basic.copyWith(
           name: _name.text.trim(),
           classLevel: _classLevel,
-          board: _board,
+          board: effectiveBoard,
           district: _district.text.trim(),
           parentMobile: _mobile.text.trim(),
         ));
@@ -164,6 +178,14 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep> {
                     selected: _board,
                     onSelect: (v) => setState(() => _board = v),
                   ),
+                  if (_board == 'other') ...[
+                    const SizedBox(height: AppSpacing.s2),
+                    LabeledField(
+                      label: isGrad ? 'Your degree / programme' : 'Your board',
+                      controller: _boardOther,
+                      hint: isGrad ? 'e.g., B.Des, BA LLB, B.Voc' : 'e.g., NIOS, Madrasah, CISCE',
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.s2),
                   LabeledField(
                     label: 'District',
